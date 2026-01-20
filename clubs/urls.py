@@ -23,4 +23,6 @@ urlpatterns = [
     path('match/<int:pk>/', views.match_detail, name='match_detail'),
     path('match/<int:pk>/edit/', views.match_update, name='match_update'),
     path('match/<int:pk>/delete/', views.match_delete, name='match_delete'),
+    # Player availability
+    path('match/<int:match_pk>/availability/<str:availability>/', views.set_availability, name='set_availability')
 ]
