@@ -175,3 +175,64 @@ def opposition_delete(request, pk):
         opposition.delete()
         return redirect('club_detail', pk=club_pk)
     return render(request, 'clubs/opposition_confirm_delete.html', {'opposition': opposition})
+
+
+@login_required
+def match_create(request, club_pk):
+    """Create a new match for a specific club"""
+    club = get_object_or_404(Club, pk=club_pk)
+    # Permission check - only admin/captain can add matches
+    if not club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = MatchForm(request.POST)
+        if form.is_valid():
+            match = form.save(commit=False)
+            match.club = club
+            match.save()
+            return redirect('match_detail', pk=match.pk)
+    else:
+        form = MatchForm()
+        # Only show opposition teams for this club
+        form.fields['opposition'].queryset = Opposition.objects.filter(club=club)
+    return render(request, 'clubs/match_form.html', {'form': form, 'club': club})
+
+
+@login_required
+def match_detail(request, pk):
+    """View a single match's details"""
+    match = get_object_or_404(Match, pk=pk)
+    return render(request, 'clubs/match_detail.html', {'match': match})
+
+
+@login_required
+def match_update(request, pk):
+    """Edit an existing match"""
+    match = get_object_or_404(Match, pk=pk)
+    # Permission check - only admin/captain can edit matches
+    if not match.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = MatchForm(request.POST, instance=match)
+        if form.is_valid():
+            form.save()
+            return redirect('match_detail', pk=match.pk)
+    else:
+        form = MatchForm(instance=match)
+        # Only show opposition teams for this club
+        form.fields['opposition'].queryset = Opposition.objects.filter(club=match.club)
+    return render(request, 'clubs/match_form.html', {'form': form, 'match': match, 'club': match.club})
+
+
+@login_required
+def match_delete(request, pk):
+    """Delete a match"""
+    match = get_object_or_404(Match, pk=pk)
+    # Permission check - only admin/captain can delete matches
+    if not match.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    club_pk = match.club.pk
+    if request.method == 'POST':
+        match.delete()
+        return redirect('club_detail', pk=club_pk)
+    return render(request, 'clubs/match_confirm_delete.html', {'match': match})

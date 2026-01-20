@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ match.club.name }} vs {{ match.opposition.name }} - MatchFeeMate</title>
+</head>
+<body>
+    <h1>{{ match.club.name }} vs {{ match.opposition.name }}</h1>
+    
+    <!-- Match details -->
+    <p><strong>Date:</strong> {{ match.date }}</p>
+    <p><strong>Time:</strong> {{ match.time|default:"TBC" }}</p>
+    <p><strong>Venue:</strong> {{ match.venue|default:"TBC" }}</p>
+    <p><strong>Home/Away:</strong> {% if match.is_home %}Home{% else %}Away{% endif %}</p>
+    <p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
+    <p><strong>Status:</strong> {{ match.get_status_display }}</p>
+    
+    <!-- Action links -->
+    <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
+    <a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
+    <a href="{% url 'club_detail' pk=match.club.pk %}">Back to Club</a>
+</body>
+</html>

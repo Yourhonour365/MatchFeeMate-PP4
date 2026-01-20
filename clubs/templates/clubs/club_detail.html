@@ -56,6 +56,32 @@
         <p>No opposition teams yet.</p>
     {% endif %}
 <hr>
+    
+    <!-- Matches section -->
+    <h2>Matches</h2>
+    <a href="{% url 'match_create' club_pk=club.pk %}">Schedule Match</a>
+    
+    {% if club.matches.all %}
+        <ul>
+        {% for match in club.matches.all %}
+            <li>
+                {{ match.date }} - vs {{ match.opposition.name }}
+                ({% if match.is_home %}H{% else %}A{% endif %})
+                - {{ match.get_status_display }}
+                - <a href="{% url 'match_detail' pk=match.pk %}">View</a>
+                - <a href="{% url 'match_update' pk=match.pk %}">Edit</a>
+                - <a href="{% url 'match_delete' pk=match.pk %}">Delete</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No matches scheduled.</p>
+    {% endif %}
+
+
+
+
+<hr>
     <a href="{% url 'account_logout' %}">Logout</a>
 </body>
 </html>

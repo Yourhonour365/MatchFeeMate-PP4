@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if match %}Edit{% else %}Schedule{% endif %} Match - MatchFeeMate</title>
+</head>
+<body>
+    <h1>{% if match %}Edit Match{% else %}Schedule Match for {{ club.name }}{% endif %}</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    
+    <a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+</body>
+</html>
