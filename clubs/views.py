@@ -236,3 +236,24 @@ def match_delete(request, pk):
         match.delete()
         return redirect('club_detail', pk=club_pk)
     return render(request, 'clubs/match_confirm_delete.html', {'match': match})
+
+@login_required
+def set_availability(request, match_pk, availability):
+    """Set player's availability for a match"""
+    match = get_object_or_404(Match, pk=match_pk)
+    # Find player record for this user in this club
+    player = Player.objects.filter(club=match.club, user=request.user).first()
+    if not player:
+        raise PermissionDenied
+    
+    # Create or update availability
+    match_player, created = MatchPlayer.objects.get_or_create(
+        match=match,
+        player=player,
+        defaults={'availability': availability}
+    )
+    if not created:
+        match_player.availability = availability
+        match_player.save()
+    
+    return redirect('match_detail', pk=match_pk)
