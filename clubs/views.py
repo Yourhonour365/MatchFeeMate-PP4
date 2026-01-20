@@ -6,9 +6,13 @@ from django.core.exceptions import PermissionDenied
 
 
 def home(request):
-    """Display the homepage"""
+    """Display the homepage - redirect to club if user has one"""
+    if request.user.is_authenticated:
+        # Check if user has a club (as a player)
+        player = Player.objects.filter(user=request.user).first()
+        if player:
+            return redirect('club_detail', pk=player.club.pk)
     return render(request, 'clubs/home.html')
-
 
 @login_required
 def club_create(request):

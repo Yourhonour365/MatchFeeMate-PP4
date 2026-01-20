@@ -14,7 +14,7 @@
     <!-- Action links -->
     <a href="{% url 'club_update' pk=club.pk %}">Edit</a> |
     <a href="{% url 'club_delete' pk=club.pk %}">Delete</a> |
-    <a href="{% url 'home' %}">Back to Home</a>
+
 
 
 <hr>
@@ -55,7 +55,7 @@
     {% else %}
         <p>No opposition teams yet.</p>
     {% endif %}
-
-
+<hr>
+    <a href="{% url 'account_logout' %}">Logout</a>
 </body>
 </html>
