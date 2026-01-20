@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Club, Player, Opposition
-from .forms import ClubForm, PlayerForm, OppositionForm
+from .models import Club, Player, Opposition, Match
+from .forms import ClubForm, PlayerForm, OppositionForm, MatchForm
 from django.core.exceptions import PermissionDenied
 
 
