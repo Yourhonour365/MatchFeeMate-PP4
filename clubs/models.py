@@ -89,3 +89,29 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.club.name} vs {self.opposition.name} - {self.date}"
+    
+class MatchPlayer(models.Model):
+    """Links players to matches - tracks availability and selection"""
+    
+    AVAILABILITY_CHOICES = [
+        ('yes', 'Available'),
+        ('no', 'Not Available'),
+        ('maybe', 'Maybe'),
+    ]
+    
+    match = models.ForeignKey(
+        Match, on_delete=models.CASCADE, related_name='match_players'
+    )
+    player = models.ForeignKey(
+        Player, on_delete=models.CASCADE, related_name='match_appearances'
+    )
+    availability = models.CharField(
+        max_length=5, choices=AVAILABILITY_CHOICES, default='maybe'
+    )
+    selected = models.BooleanField(default=False)
+    
+    class Meta:
+        unique_together = ['match', 'player']  # Player can only appear once per match
+    
+    def __str__(self):
+        return f"{self.player.name} - {self.match}"  
