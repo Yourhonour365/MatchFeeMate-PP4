@@ -1,5 +1,5 @@
 from django import forms
-from .models import Club, Player
+from .models import Club, Player, Opposition
 
 
 class ClubForm(forms.ModelForm):
@@ -11,4 +11,10 @@ class PlayerForm(forms.ModelForm):
     """Form for creating and editing players"""
     class Meta:
         model = Player
-        fields = ['name', 'email', 'phone']       
+        fields = ['name', 'email', 'phone']
+
+class OppositionForm(forms.ModelForm):
+    """Form for creating and editing opposition teams"""
+    class Meta:
+        model = Opposition
+        fields = ['name', 'home_ground']      

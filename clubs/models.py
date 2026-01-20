@@ -38,3 +38,15 @@ class Player(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.club.name})"
+    
+class Opposition(models.Model):
+    """Opposition teams that the club plays against"""
+    
+    club = models.ForeignKey(
+        Club, on_delete=models.CASCADE, related_name='oppositions'
+    )
+    name = models.CharField(max_length=100)
+    home_ground = models.CharField(max_length=100, blank=True)
+    
+    def __str__(self):
+        return self.name

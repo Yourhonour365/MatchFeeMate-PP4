@@ -36,7 +36,25 @@
     {% else %}
         <p>No players yet.</p>
     {% endif %}
-
+<hr>
+    
+    <!-- Opposition section -->
+    <h2>Opposition Teams</h2>
+    <a href="{% url 'opposition_create' club_pk=club.pk %}">Add Opposition</a>
+    
+    {% if club.oppositions.all %}
+        <ul>
+        {% for opp in club.oppositions.all %}
+            <li>
+                {{ opp.name }} {% if opp.home_ground %}({{ opp.home_ground }}){% endif %}
+                - <a href="{% url 'opposition_update' pk=opp.pk %}">Edit</a>
+                - <a href="{% url 'opposition_delete' pk=opp.pk %}">Delete</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No opposition teams yet.</p>
+    {% endif %}
 
 
 </body>

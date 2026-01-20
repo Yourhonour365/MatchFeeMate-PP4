@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Club, Player
-from .forms import ClubForm, PlayerForm
+from .models import Club, Player, Opposition
+from .forms import ClubForm, PlayerForm, OppositionForm
 
 
 def home(request):
@@ -98,3 +98,43 @@ def player_delete(request, pk):
         player.delete()
         return redirect('club_detail', pk=club_pk)
     return render(request, 'clubs/player_confirm_delete.html', {'player': player})
+
+@login_required
+def opposition_create(request, club_pk):
+    """Create a new opposition team for a specific club"""
+    club = get_object_or_404(Club, pk=club_pk)
+    if request.method == 'POST':
+        form = OppositionForm(request.POST)
+        if form.is_valid():
+            opposition = form.save(commit=False)
+            opposition.club = club
+            opposition.save()
+            return redirect('club_detail', pk=club.pk)
+    else:
+        form = OppositionForm()
+    return render(request, 'clubs/opposition_form.html', {'form': form, 'club': club})
+
+
+@login_required
+def opposition_update(request, pk):
+    """Edit an existing opposition team"""
+    opposition = get_object_or_404(Opposition, pk=pk)
+    if request.method == 'POST':
+        form = OppositionForm(request.POST, instance=opposition)
+        if form.is_valid():
+            form.save()
+            return redirect('club_detail', pk=opposition.club.pk)
+    else:
+        form = OppositionForm(instance=opposition)
+    return render(request, 'clubs/opposition_form.html', {'form': form, 'opposition': opposition, 'club': opposition.club})
+
+
+@login_required
+def opposition_delete(request, pk):
+    """Delete an opposition team"""
+    opposition = get_object_or_404(Opposition, pk=pk)
+    club_pk = opposition.club.pk
+    if request.method == 'POST':
+        opposition.delete()
+        return redirect('club_detail', pk=club_pk)
+    return render(request, 'clubs/opposition_confirm_delete.html', {'opposition': opposition})
