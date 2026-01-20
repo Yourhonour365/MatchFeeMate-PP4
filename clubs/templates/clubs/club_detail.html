@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ club.name }} - MatchFeeMate</title>
+</head>
+<body>
+    <h1>{{ club.name }}</h1>
+    
+    <!-- Display club details -->
+    <p><strong>Home Ground:</strong> {{ club.home_ground|default:"Not set" }}</p>
+    <p><strong>Default Match Fee:</strong> £{{ club.default_match_fee }}</p>
+    <p><strong>Created by:</strong> {{ club.created_by.email }}</p>
+    
+    <!-- Action links -->
+    <a href="{% url 'club_update' pk=club.pk %}">Edit</a> |
+    <a href="{% url 'club_delete' pk=club.pk %}">Delete</a> |
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>
