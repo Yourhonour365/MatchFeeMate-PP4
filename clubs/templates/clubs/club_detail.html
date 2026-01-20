@@ -15,5 +15,29 @@
     <a href="{% url 'club_update' pk=club.pk %}">Edit</a> |
     <a href="{% url 'club_delete' pk=club.pk %}">Delete</a> |
     <a href="{% url 'home' %}">Back to Home</a>
+
+
+<hr>
+    
+    <!-- Players section -->
+    <h2>Players</h2>
+    <a href="{% url 'player_create' club_pk=club.pk %}">Add Player</a>
+    
+    {% if club.players.all %}
+        <ul>
+        {% for player in club.players.all %}
+            <li>
+                {{ player.name }} ({{ player.get_role_display }})
+                - <a href="{% url 'player_update' pk=player.pk %}">Edit</a>
+                - <a href="{% url 'player_delete' pk=player.pk %}">Delete</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No players yet.</p>
+    {% endif %}
+
+
+
 </body>
 </html>

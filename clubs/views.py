@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Club
-from .forms import ClubForm
+from .models import Club, Player
+from .forms import ClubForm, PlayerForm
 
 
 def home(request):
@@ -58,3 +58,43 @@ def club_delete(request, pk):
         club.delete()
         return redirect('home')
     return render(request, 'clubs/club_confirm_delete.html', {'club': club})
+
+@login_required
+def player_create(request, club_pk):
+    """Create a new player for a specific club"""
+    club = get_object_or_404(Club, pk=club_pk)
+    if request.method == 'POST':
+        form = PlayerForm(request.POST)
+        if form.is_valid():
+            player = form.save(commit=False)
+            player.club = club
+            player.save()
+            return redirect('club_detail', pk=club.pk)
+    else:
+        form = PlayerForm()
+    return render(request, 'clubs/player_form.html', {'form': form, 'club': club})
+
+
+@login_required
+def player_update(request, pk):
+    """Edit an existing player"""
+    player = get_object_or_404(Player, pk=pk)
+    if request.method == 'POST':
+        form = PlayerForm(request.POST, instance=player)
+        if form.is_valid():
+            form.save()
+            return redirect('club_detail', pk=player.club.pk)
+    else:
+        form = PlayerForm(instance=player)
+    return render(request, 'clubs/player_form.html', {'form': form, 'player': player, 'club': player.club})
+
+
+@login_required
+def player_delete(request, pk):
+    """Delete a player - requires POST confirmation"""
+    player = get_object_or_404(Player, pk=pk)
+    club_pk = player.club.pk
+    if request.method == 'POST':
+        player.delete()
+        return redirect('club_detail', pk=club_pk)
+    return render(request, 'clubs/player_confirm_delete.html', {'player': player})
