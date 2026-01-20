@@ -13,7 +13,23 @@
     <p><strong>Home/Away:</strong> {% if match.is_home %}Home{% else %}Away{% endif %}</p>
     <p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
     <p><strong>Status:</strong> {{ match.get_status_display }}</p>
+    <hr>
     
+    <!-- Player availability section -->
+    <h2>Squad Availability</h2>
+    
+    {% if match.match_players.all %}
+        <ul>
+        {% for mp in match.match_players.all %}
+            <li>
+                {{ mp.player.name }} - {{ mp.get_availability_display }}
+                {% if mp.selected %}<strong>(Selected)</strong>{% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No availability recorded yet.</p>
+    {% endif %}
     <!-- Action links -->
     <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
     <a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
