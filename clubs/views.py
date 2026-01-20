@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Club, Player, Opposition
 from .forms import ClubForm, PlayerForm, OppositionForm
+from django.core.exceptions import PermissionDenied
 
 
 def home(request):
@@ -20,6 +21,14 @@ def club_create(request):
             club = form.save(commit=False)
             club.created_by = request.user
             club.save()
+            # Create the user as admin of this club
+            Player.objects.create(
+                club=club,
+                user=request.user,
+                name=request.user.email,
+                email=request.user.email,
+                role='admin'
+            )
             return redirect('club_detail', pk=club.pk)
     else:
         # Show empty form
@@ -38,6 +47,9 @@ def club_detail(request, pk):
 def club_update(request, pk):
     """Edit an existing club"""
     club = get_object_or_404(Club, pk=pk)
+    # Permission check - only admin/captain can edit club
+    if not club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         # Form was submitted with changes
         form = ClubForm(request.POST, instance=club)
@@ -54,6 +66,9 @@ def club_update(request, pk):
 def club_delete(request, pk):
     """Delete a club - requires POST confirmation"""
     club = get_object_or_404(Club, pk=pk)
+    # Permission check - only admin/captain can delete club
+    if not club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         club.delete()
         return redirect('home')
@@ -63,6 +78,9 @@ def club_delete(request, pk):
 def player_create(request, club_pk):
     """Create a new player for a specific club"""
     club = get_object_or_404(Club, pk=club_pk)
+    # Permission check - only admin/captain can add players
+    if not club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         form = PlayerForm(request.POST)
         if form.is_valid():
@@ -79,6 +97,9 @@ def player_create(request, club_pk):
 def player_update(request, pk):
     """Edit an existing player"""
     player = get_object_or_404(Player, pk=pk)
+    # Permission check - only admin/captain can edit players
+    if not player.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         form = PlayerForm(request.POST, instance=player)
         if form.is_valid():
@@ -93,6 +114,9 @@ def player_update(request, pk):
 def player_delete(request, pk):
     """Delete a player - requires POST confirmation"""
     player = get_object_or_404(Player, pk=pk)
+    # Permission check - only admin/captain can delete players
+    if not player.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     club_pk = player.club.pk
     if request.method == 'POST':
         player.delete()
@@ -103,6 +127,9 @@ def player_delete(request, pk):
 def opposition_create(request, club_pk):
     """Create a new opposition team for a specific club"""
     club = get_object_or_404(Club, pk=club_pk)
+    # Permission check - only admin/captain can add opposition
+    if not club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         form = OppositionForm(request.POST)
         if form.is_valid():
@@ -119,6 +146,9 @@ def opposition_create(request, club_pk):
 def opposition_update(request, pk):
     """Edit an existing opposition team"""
     opposition = get_object_or_404(Opposition, pk=pk)
+    # Permission check - only admin/captain can edit opposition
+    if not opposition.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     if request.method == 'POST':
         form = OppositionForm(request.POST, instance=opposition)
         if form.is_valid():
@@ -133,6 +163,9 @@ def opposition_update(request, pk):
 def opposition_delete(request, pk):
     """Delete an opposition team"""
     opposition = get_object_or_404(Opposition, pk=pk)
+    # Permission check - only admin/captain can delete opposition
+    if not opposition.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
     club_pk = opposition.club.pk
     if request.method == 'POST':
         opposition.delete()

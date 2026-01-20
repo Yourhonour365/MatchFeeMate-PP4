@@ -13,6 +13,14 @@ class Club(models.Model):
         User, on_delete=models.CASCADE, related_name='clubs_created'
     )
 
+    def is_admin_or_captain(self, user):
+        """Check if user is admin or captain of this club"""
+        return self.players.filter(
+            user=user,
+            role__in=['admin', 'captain']
+        ).exists()
+
+
 class Player(models.Model):
     """A player/member belonging to a club"""
     
