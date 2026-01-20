@@ -58,3 +58,34 @@ class Opposition(models.Model):
     
     def __str__(self):
         return self.name
+    
+
+class Match(models.Model):
+    """A scheduled cricket match"""
+    
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    club = models.ForeignKey(
+        Club, on_delete=models.CASCADE, related_name='matches'
+    )
+    opposition = models.ForeignKey(
+        Opposition, on_delete=models.CASCADE, related_name='matches'
+    )
+    date = models.DateField()
+    time = models.TimeField(null=True, blank=True)
+    venue = models.CharField(max_length=100, blank=True)
+    is_home = models.BooleanField(default=True)
+    match_fee = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='scheduled'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.club.name} vs {self.opposition.name} - {self.date}"
