@@ -11,4 +11,4 @@ class PlayerForm(forms.ModelForm):
     """Form for creating and editing players"""
     class Meta:
         model = Player
-        fields = ['name', 'email', 'phone', 'role', 'is_active']       
+        fields = ['name', 'email', 'phone']       
