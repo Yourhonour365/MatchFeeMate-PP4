@@ -30,6 +30,13 @@
     {% else %}
         <p>No availability recorded yet.</p>
     {% endif %}
+    <hr>
+    
+    <!-- Set your availability -->
+    <h3>Your Availability</h3>
+    <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}">Available</a> |
+    <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
+    <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a>
     <!-- Action links -->
     <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
     <a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
