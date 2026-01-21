@@ -3,14 +3,13 @@
 {% block title %}{{ club.name }} - MatchFeeMate{% endblock %}
 
 {% block content %}
-<!-- Club heading and details -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>{{ club.name }}</h1>
-    <!-- Club action buttons -->
-    <div>
-        <a href="{% url 'club_update' pk=club.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
-        <a href="{% url 'club_delete' pk=club.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
-    </div>
+<!-- Club heading -->
+<h1>{{ club.name }}</h1>
+
+<!-- Club action buttons below title -->
+<div class="mb-3">
+    <a href="{% url 'club_update' pk=club.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
+    <a href="{% url 'club_delete' pk=club.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
 </div>
 
 <!-- Club info card -->
@@ -25,7 +24,7 @@
 <!-- Opposition section -->
 <div class="d-flex justify-content-between align-items-center mb-2">
     <h2>Opposition Teams</h2>
-    <a href="{% url 'opposition_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Opposition</a>
+    <a href="{% url 'opposition_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add</a>
 </div>
 
 {% if club.oppositions.all %}
