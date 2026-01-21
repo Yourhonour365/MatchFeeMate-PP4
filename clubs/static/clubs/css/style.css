@@ -196,3 +196,14 @@ a:hover {
 .text-maybe {
     color: #E65100;
 }
+
+/* === Maybe header - light amber === */
+.card-header-maybe {
+    background-color: #FFE0B2;
+    color: var(--mfm-text-primary);
+}
+
+/* === Not Available status - dark red === */
+.text-unavailable {
+    color: #C62828;
+}

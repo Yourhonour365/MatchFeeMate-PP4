@@ -3,49 +3,114 @@
 {% block title %}Update Availability - MatchFeeMate{% endblock %}
 
 {% block content %}
-<!-- Page heading -->
-<h1>Update Availability</h1>
-<h2>{{ match.club.name }} vs {{ match.opposition.name }} - {{ match.date }}</h2>
+<!-- Match header - compact -->
+<div class="card card-mfm mb-3">
+    <div class="card-body py-2">
+        <h5 class="card-title mb-0">vs {{ match.opposition.name }} ({% if match.is_home %}H{% else %}A{% endif %})</h5>
+        <p class="small mb-0 mt-1">{{ match.date|date:"D d M Y" }} · {{ match.venue|default:"TBC" }}</p>
+    </div>
+</div>
 
 <form method="post">
     {% csrf_token %}
     
     <!-- Selected players list -->
-    <h3>Selected Players</h3>
-    {% for player in selected_players %}
-    <div>
-        <input type="checkbox" name="players" value="{{ player.pk }}" id="selected_{{ player.pk }}">
-        <label for="selected_{{ player.pk }}">{{ player.name }}</label>
+    <div class="card card-mfm mb-3">
+        <div class="card-header py-1 card-header-selected">
+            <strong>Selected Players</strong>
+        </div>
+        <div class="card-body py-2">
+            {% for player in selected_players %}
+            <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %}">
+                <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="selected_{{ player.pk }}">
+                <label class="form-check-label" for="selected_{{ player.pk }}">{{ player.name }}</label>
+            </div>
+            {% empty %}
+            <p class="text-muted mb-0 small">No players selected yet.</p>
+            {% endfor %}
+        </div>
     </div>
-    {% empty %}
-    <p>No players selected yet.</p>
-    {% endfor %}
     
-    <!-- Other players list -->
-    <h3>Other Players</h3>
-    {% for player in other_players %}
-    <div>
-        <input type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
-        <label for="other_{{ player.pk }}">
-            {{ player.name }} ({{ player.current_availability }})
-        </label>
+    <!-- Players list sorted by availability -->
+    <div class="card card-mfm mb-3">
+        <div class="card-header py-1 card-header-available">
+            <strong>Players</strong>
+        </div>
+        <div class="card-body py-2">
+            <!-- Available players first -->
+            {% for player in other_players %}
+                {% if player.current_availability == 'Available' %}
+                <div class="form-check py-1 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
+                        <label class="form-check-label" for="other_{{ player.pk }}">{{ player.name }}</label>
+                    </div>
+                    <small class="text-success">{{ player.current_availability }}</small>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Maybe players second -->
+            {% for player in other_players %}
+                {% if player.current_availability == 'Maybe' %}
+                <div class="form-check py-1 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
+                        <label class="form-check-label" for="other_{{ player.pk }}">{{ player.name }}</label>
+                    </div>
+                    <small class="text-maybe">{{ player.current_availability }}</small>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Unavailable players third -->
+            {% for player in other_players %}
+                {% if player.current_availability == 'Not Available' %}
+                <div class="form-check py-1 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
+                        <label class="form-check-label" for="other_{{ player.pk }}">{{ player.name }}</label>
+                    </div>
+                    <small class="text-danger">{{ player.current_availability }}</small>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Awaiting response last -->
+            {% for player in other_players %}
+                {% if player.current_availability == 'Awaiting response' %}
+                <div class="form-check py-1 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
+                        <label class="form-check-label" for="other_{{ player.pk }}">{{ player.name }}</label>
+                    </div>
+                    <small class="text-muted">{{ player.current_availability }}</small>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            {% if not other_players %}
+            <p class="text-muted mb-0 small">No other players.</p>
+            {% endif %}
+        </div>
     </div>
-    {% empty %}
-    <p>No other players.</p>
-    {% endfor %}
     
     <!-- Availability selector -->
-    <h3>Set Availability To</h3>
-    <select name="availability" required>
-        <option value="yes">Available</option>
-        <option value="no">Not Available</option>
-        <option value="maybe">Maybe</option>
-    </select>
+    <div class="card card-mfm mb-3">
+        <div class="card-body py-2">
+            <label class="form-label"><strong>Set Availability To:</strong></label>
+            <select name="availability" class="form-select" required>
+                <option value="yes">Available</option>
+                <option value="no">Not Available</option>
+                <option value="maybe">Maybe</option>
+            </select>
+        </div>
+    </div>
     
-    <br><br>
-    <button type="submit">Update Selected</button>
+    <!-- Action buttons -->
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-mfm-dark-blue flex-fill">Update Selected</button>
+        <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
 </form>
-
-<br>
-<a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
 {% endblock %}

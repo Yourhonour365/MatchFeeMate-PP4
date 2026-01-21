@@ -38,7 +38,7 @@
                 {% if mp.selected %}
                 <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
                     <span>{{ mp.player.name }}</span>
-                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-maybe{% endif %}">
+                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-unavailable{% else %}text-maybe{% endif %}">
                         {{ mp.get_availability_display }}
                     </small>
                 </div>
@@ -72,7 +72,7 @@
 
 <!-- Maybe/Unavailable collapsed -->
 <div class="card card-mfm mb-3">
-    <div class="card-header py-1">
+    <div class="card-header py-1 card-header-maybe">
         <strong>Maybe / Unavailable</strong>
     </div>
     <div class="card-body py-2">
@@ -80,7 +80,7 @@
             {% if not mp.selected and mp.availability != 'yes' %}
             <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
                 <span>{{ mp.player.name }}</span>
-                <small class="{% if mp.availability == 'no' %}text-danger{% else %}text-maybe{% endif %}">
+                <small class="{% if mp.availability == 'no' %}text-unavailable{% else %}text-maybe{% endif %}">
                     {{ mp.get_availability_display }}
                 </small>
             </div>
@@ -103,6 +103,6 @@
 
 <!-- Delete link at very bottom -->
 <div class="text-center">
-    <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-danger">Delete match</a></small>
+    <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-unavailable">Delete match</a></small>
 </div>
 {% endblock %}
