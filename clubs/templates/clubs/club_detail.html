@@ -29,9 +29,9 @@
 </div>
 
 {% if club.players.all %}
-    <ul class="list-group mb-4">
     {% for player in club.players.all %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="card card-mfm mb-2">
+        <div class="card-body py-2 d-flex justify-content-between align-items-center">
             <span>
                 {{ player.name }}
                 {% if player.role != 'player' %}<span class="badge bg-secondary ms-2">{{ player.get_role_display }}</span>{% endif %}
@@ -40,73 +40,66 @@
                 <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
                 <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
             </div>
-        </li>
+        </div>
+    </div>
     {% endfor %}
-    </ul>
 {% else %}
     <p class="text-muted mb-4">No players yet.</p>
 {% endif %}
 
 <!-- Opposition section -->
-<div class="d-flex justify-content-between align-items-center mb-2">
+<div class="d-flex justify-content-between align-items-center mb-2 mt-4">
     <h2>Opposition Teams</h2>
     <a href="{% url 'opposition_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Opposition</a>
 </div>
 
 {% if club.oppositions.all %}
-    <ul class="list-group mb-4">
     {% for opp in club.oppositions.all %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="card card-mfm mb-2">
+        <div class="card-body py-2 d-flex justify-content-between align-items-center">
             <span>{{ opp.name }}</span>
             <div>
                 <a href="{% url 'opposition_update' pk=opp.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
                 <a href="{% url 'opposition_delete' pk=opp.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
             </div>
-        </li>
+        </div>
+    </div>
     {% endfor %}
-    </ul>
 {% else %}
     <p class="text-muted mb-4">No opposition teams yet.</p>
 {% endif %}
 
 <!-- Matches section -->
-<div class="d-flex justify-content-between align-items-center mb-2">
+<div class="d-flex justify-content-between align-items-center mb-2 mt-4">
     <h2>Matches</h2>
     <a href="{% url 'match_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Schedule Match</a>
 </div>
 
 {% if club.matches.all %}
-<!-- Responsive table wrapper - allows horizontal scroll on mobile -->
-<div class="table-responsive">
-    <table class="table table-mfm table-striped">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Opposition</th>
-                <th>H/A</th>
-                <th>Selected</th>
-                <th>Available</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for match in club.matches.all %}
-            <tr>
-                <td>{{ match.date|date:"d M" }}</td>
-                <td>{{ match.opposition.name }}</td>
-                <td>{% if match.is_home %}H{% else %}A{% endif %}</td>
-                <td>{{ match.selected_count }}/11</td>
-                <td>{{ match.available_count }}</td>
-                <td>{{ match.get_status_display }}</td>
-                <td>
-                    <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm">View</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    {% for match in club.matches.all %}
+    <!-- Match card - mobile friendly -->
+    <div class="card card-mfm mb-3">
+        <div class="card-body">
+            <!-- Match header: date and home/away badge -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">{{ match.date|date:"D d M" }}</span>
+                <span class="badge {% if match.is_home %}bg-success{% else %}bg-secondary{% endif %}">
+                    {% if match.is_home %}Home{% else %}Away{% endif %}
+                </span>
+            </div>
+            <!-- Opposition name -->
+            <h5 class="card-title mb-2">vs {{ match.opposition.name }}</h5>
+            <!-- Match stats row -->
+            <div class="d-flex justify-content-between text-muted mb-3">
+                <span>Selected: {{ match.selected_count }}/11</span>
+                <span>Available: {{ match.available_count }}</span>
+                <span>{{ match.get_status_display }}</span>
+            </div>
+            <!-- Action button -->
+            <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm w-100">View Match</a>
+        </div>
+    </div>
+    {% endfor %}
 {% else %}
     <p class="text-muted">No matches scheduled.</p>
 {% endif %}
