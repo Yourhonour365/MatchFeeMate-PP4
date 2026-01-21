@@ -20,9 +20,10 @@
 
 <!-- Warning for unavailable selected players -->
 {% if unavailable_selected %}
-<div class="alert alert-mfm-error mb-3 py-2">
-    <strong>Warning:</strong> Selected players not available:
+<div class="alert alert-mfm-error mb-3 py-2 alert-dismissible fade show">
+    <strong>Warning:</strong> The following selected players have not confirmed availability:
     {% for mp in unavailable_selected %}{{ mp.player.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    <button type="button" class="btn btn-sm btn-outline-dark ms-2" data-bs-dismiss="alert">Dismiss</button>
 </div>
 {% endif %}
 
