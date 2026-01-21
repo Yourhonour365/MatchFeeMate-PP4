@@ -208,7 +208,17 @@ def match_create(request, club_pk):
 def match_detail(request, pk):
     """View a single match's details"""
     match = get_object_or_404(Match, pk=pk)
-    return render(request, 'clubs/match_detail.html', {'match': match})
+    
+    # Count selected and available
+    match_players = match.match_players.all()
+    selected_count = match_players.filter(selected=True).count()
+    available_count = match_players.filter(availability='yes', selected=False).count()
+    
+    return render(request, 'clubs/match_detail.html', {
+        'match': match,
+        'selected_count': selected_count,
+        'available_count': available_count,
+    })
 
 
 @login_required

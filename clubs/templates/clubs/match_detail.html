@@ -15,21 +15,32 @@
     <p><strong>Status:</strong> {{ match.get_status_display }}</p>
     <hr>
     
-    <!-- Player availability section -->
-    <h2>Squad Availability</h2>
     
-    {% if match.match_players.all %}
-        <ul>
-        {% for mp in match.match_players.all %}
-            <li>
-                {{ mp.player.name }} - {{ mp.get_availability_display }}
-                {% if mp.selected %}<strong>(Selected)</strong>{% endif %}
-            </li>
+    
+    <!-- Selected Team -->
+    <h2>Selected Team ({{ selected_count }}/11)</h2>
+    {% with selected=match.match_players.all %}
+        {% for mp in selected %}
+            {% if mp.selected %}
+                <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+            {% endif %}
+        {% empty %}
         {% endfor %}
-        </ul>
-    {% else %}
-        <p>No availability recorded yet.</p>
+    {% endwith %}
+    
+    {% if not match.match_players.all %}
+        <p>No team selected yet.</p>
     {% endif %}
+    
+    <hr>
+    
+    <!-- Squad Availability -->
+    <h2>Available ({{ available_count }})</h2>
+    {% for mp in match.match_players.all %}
+        {% if not mp.selected %}
+            <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+        {% endif %}
+    {% endfor %}
     <hr>
     
     <!-- Set your availability -->
