@@ -6,7 +6,9 @@
 <!-- Page heading -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Matches</h1>
+    {% if is_admin_or_captain %}
     <a href="{% url 'match_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Schedule Match</a>
+    {% endif %}
 </div>
 
 {% if matches %}
@@ -38,3 +40,8 @@
     <p class="text-muted">No matches scheduled.</p>
 {% endif %}
 {% endblock %}
+```
+
+Now show me `player_list.html`:
+```
+type clubs\templates\clubs\player_list.html

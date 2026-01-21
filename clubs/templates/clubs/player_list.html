@@ -6,7 +6,9 @@
 <!-- Page heading -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Players</h1>
+    {% if is_admin_or_captain %}
     <a href="{% url 'player_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Player</a>
+    {% endif %}
 </div>
 
 {% if players %}
@@ -17,10 +19,12 @@
                 {{ player.name }}
                 {% if player.role != 'player' %}<span class="badge bg-secondary ms-2">{{ player.get_role_display }}</span>{% endif %}
             </span>
+            {% if is_admin_or_captain %}
             <div>
                 <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
                 <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
             </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
@@ -28,3 +32,17 @@
     <p class="text-muted">No players yet.</p>
 {% endif %}
 {% endblock %}
+```
+
+Now test it — log in as your test player and check they can't see admin buttons. Then commit:
+```
+git add -A
+```
+```
+git commit -m "Hide admin buttons from regular players in templates"
+```
+```
+git push origin main
+```
+```
+git push heroku main

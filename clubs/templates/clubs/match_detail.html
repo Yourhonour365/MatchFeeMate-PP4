@@ -10,16 +10,18 @@
         <small class="text-muted fst-italic">{{ match.get_status_display }}</small>
         <p class="small mb-1 mt-1"><strong>{{ match.date|date:"D d M Y" }}</strong> {{ match.time|default:"" }} · {{ match.venue|default:"TBC" }} · £{{ match.match_fee|default:"TBC" }}</p>
         
-        <!-- Actions -->
+        <!-- Actions - admin/captain only -->
+        {% if is_admin_or_captain %}
         <div class="d-flex gap-2 mt-2">
             <a href="#availability" class="btn btn-mfm-dark-blue btn-sm d-md-none">View Availability</a>
             <a href="{% url 'match_update' pk=match.pk %}" class="btn btn-mfm-brown btn-sm">Edit Match</a>
         </div>
+        {% endif %}
     </div>
 </div>
 
-<!-- Warning for unavailable selected players -->
-{% if unavailable_selected %}
+<!-- Warning for unavailable selected players - admin/captain only -->
+{% if is_admin_or_captain and unavailable_selected %}
 <div class="alert alert-mfm-error mb-3 py-2 alert-dismissible fade show">
     <strong>Warning:</strong> The following selected players have not confirmed availability:
     {% for mp in unavailable_selected %}{{ mp.player.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
@@ -31,7 +33,9 @@
 <div class="card card-mfm mb-3">
     <div class="card-header py-1 card-header-selected d-flex justify-content-between align-items-center">
         <strong>Selected ({{ selected_count }}/11)</strong>
+        {% if is_admin_or_captain %}
         <a href="{% url 'team_selection' match_pk=match.pk %}" class="btn btn-mfm-primary btn-sm py-0">Edit Selection</a>
+        {% endif %}
     </div>
     <div class="card-body py-2">
         {% with selected=match.match_players.all|dictsort:"player.name" %}
@@ -52,11 +56,13 @@
     </div>
 </div>
 
-<!-- Available Players card - prominent for captain -->
+<!-- Available Players card -->
 <div class="card card-mfm mb-3" id="availability">
     <div class="card-header py-1 card-header-available d-flex justify-content-between align-items-center">
         <strong>Available ({{ available_count }})</strong>
+        {% if is_admin_or_captain %}
         <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-mfm-dark-blue btn-sm py-0">Edit Availability</a>
+        {% endif %}
     </div>
     <div class="card-body py-2">
         {% for mp in match.match_players.all|dictsort:"player.name" %}
@@ -89,8 +95,22 @@
         {% endfor %}
     </div>
 </div>
-
-<!-- Your Availability at bottom -->
+<!-- Not Responded -->
+{% if not_responded %}
+<div class="card card-mfm mb-3">
+    <div class="card-header py-1 bg-light">
+        <strong>Awaiting Response ({{ not_responded|length }})</strong>
+    </div>
+    <div class="card-body py-2">
+        {% for player in not_responded %}
+        <div class="py-1 {% if not forloop.last %}border-bottom{% endif %}">
+            {{ player.name }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+<!-- Your Availability at bottom - all players can see -->
 <div class="card card-mfm mb-3">
     <div class="card-body py-2">
         <strong class="small">Your Availability:</strong>
@@ -102,8 +122,10 @@
     </div>
 </div>
 
-<!-- Delete link at very bottom -->
+<!-- Delete link - admin/captain only -->
+{% if is_admin_or_captain %}
 <div class="text-center">
     <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-unavailable">Delete match</a></small>
 </div>
+{% endif %}
 {% endblock %}

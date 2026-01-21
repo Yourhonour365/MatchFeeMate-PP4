@@ -6,11 +6,13 @@
 <!-- Club heading -->
 <h1>{{ club.name }}</h1>
 
-<!-- Club action buttons below title -->
+<!-- Club action buttons - admin/captain only -->
+{% if is_admin_or_captain %}
 <div class="mb-3">
     <a href="{% url 'club_update' pk=club.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
     <a href="{% url 'club_delete' pk=club.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
 </div>
+{% endif %}
 
 <!-- Club info card -->
 <div class="card card-mfm mb-4">
@@ -24,7 +26,9 @@
 <!-- Opposition section -->
 <div class="d-flex justify-content-between align-items-center mb-2">
     <h2>Opposition Teams</h2>
+    {% if is_admin_or_captain %}
     <a href="{% url 'opposition_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add</a>
+    {% endif %}
 </div>
 
 {% if club.oppositions.all %}
@@ -32,10 +36,12 @@
     <div class="card card-mfm mb-2">
         <div class="card-body py-2 d-flex justify-content-between align-items-center">
             <span>{{ opp.name }}</span>
+            {% if is_admin_or_captain %}
             <div>
                 <a href="{% url 'opposition_update' pk=opp.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
                 <a href="{% url 'opposition_delete' pk=opp.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
             </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

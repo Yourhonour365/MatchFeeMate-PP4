@@ -44,7 +44,11 @@ def club_create(request):
 def club_detail(request, pk):
     """View a single club's details"""
     club = get_object_or_404(Club, pk=pk)
-    return render(request, 'clubs/club_detail.html', {'club': club})
+    is_admin_or_captain = club.is_admin_or_captain(request.user)
+    return render(request, 'clubs/club_detail.html', {
+        'club': club,
+        'is_admin_or_captain': is_admin_or_captain,
+    })
 
 
 @login_required
@@ -217,13 +221,21 @@ def match_detail(request, pk):
     # Warning: selected but not available
     unavailable_selected = match_players.filter(selected=True).exclude(availability='yes')
     
+    # Permission check
+    is_admin_or_captain = match.club.is_admin_or_captain(request.user)
+    
+    # Players who haven't responded yet
+    responded_player_ids = match_players.values_list('player_id', flat=True)
+    not_responded = Player.objects.filter(club=match.club, is_active=True).exclude(id__in=responded_player_ids)
+    
     return render(request, 'clubs/match_detail.html', {
         'match': match,
         'selected_count': selected_count,
         'available_count': available_count,
         'unavailable_selected': unavailable_selected,
+        'is_admin_or_captain': is_admin_or_captain,
+        'not_responded': not_responded,
     })
-
 
 @login_required
 def match_update(request, pk):
@@ -385,11 +397,12 @@ def match_list(request):
         return redirect('home')
     
     matches = Match.objects.filter(club=player.club).order_by('date')
+    is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
         'matches': matches,
         'club': player.club,
+        'is_admin_or_captain': is_admin_or_captain,
     })
-
 
 @login_required
 def player_list(request):
@@ -399,7 +412,9 @@ def player_list(request):
         return redirect('home')
     
     players = Player.objects.filter(club=player.club, is_active=True)
+    is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/player_list.html', {
         'players': players,
         'club': player.club,
+        'is_admin_or_captain': is_admin_or_captain,
     })
