@@ -1,70 +1,68 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ match.club.name }} vs {{ match.opposition.name }} - MatchFeeMate</title>
-</head>
-<body>
-    <h1>{{ match.club.name }} vs {{ match.opposition.name }}</h1>
-    
-    <!-- Match details -->
-    <p><strong>Date:</strong> {{ match.date }}</p>
-    <p><strong>Time:</strong> {{ match.time|default:"TBC" }}</p>
-    <p><strong>Venue:</strong> {{ match.venue|default:"TBC" }}</p>
-    <p><strong>Home/Away:</strong> {% if match.is_home %}Home{% else %}Away{% endif %}</p>
-    <p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
-    <p><strong>Status:</strong> {{ match.get_status_display }}</p>
-    <hr>
-    <p><strong>Status:</strong> {{ match.get_status_display }}</p>
-    <hr>
-    
-    {% if unavailable_selected %}
-    <p style="color: red;"><strong>Warning:</strong> These selected players are not available:</p>
-    <ul>
-    {% for mp in unavailable_selected %}
-        <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
-    {% endfor %}
-    </ul>
-    <hr>
-    {% endif %}
-    
-        
-    <!-- Selected Team -->
-    <h2>Selected Team ({{ selected_count }}/11)</h2>
-    {% with selected=match.match_players.all %}
-        {% for mp in selected %}
-            {% if mp.selected %}
-                <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
-            {% endif %}
-        {% empty %}
-        {% endfor %}
-    {% endwith %}
-    
-    {% if not match.match_players.all %}
-        <p>No team selected yet.</p>
-    {% endif %}
-    
-    <hr>
-    
-    <!-- Squad Availability -->
-    <h2>Available ({{ available_count }})</h2>
-    {% for mp in match.match_players.all %}
-        {% if not mp.selected %}
+{% extends 'clubs/base.html' %}
+
+{% block title %}{{ match.club.name }} vs {{ match.opposition.name }} - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<h1>{{ match.club.name }} vs {{ match.opposition.name }}</h1>
+
+<!-- Match details -->
+<p><strong>Date:</strong> {{ match.date }}</p>
+<p><strong>Time:</strong> {{ match.time|default:"TBC" }}</p>
+<p><strong>Venue:</strong> {{ match.venue|default:"TBC" }}</p>
+<p><strong>Home/Away:</strong> {% if match.is_home %}Home{% else %}Away{% endif %}</p>
+<p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
+<p><strong>Status:</strong> {{ match.get_status_display }}</p>
+<hr>
+
+<!-- Warning for unavailable selected players -->
+{% if unavailable_selected %}
+<p style="color: red;"><strong>Warning:</strong> These selected players are not available:</p>
+<ul>
+{% for mp in unavailable_selected %}
+    <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+{% endfor %}
+</ul>
+<hr>
+{% endif %}
+
+<!-- Selected Team -->
+<h2>Selected Team ({{ selected_count }}/11)</h2>
+{% with selected=match.match_players.all %}
+    {% for mp in selected %}
+        {% if mp.selected %}
             <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
         {% endif %}
+    {% empty %}
     {% endfor %}
-    <hr>
-    
-    <!-- Set your availability -->
-    <h3>Your Availability</h3>
-    <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}">Available</a> |
-    <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
-    <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a> |
-    <hr>
-    <!-- Action links -->
-    <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a> |
-    <a href="{% url 'bulk_availability' match_pk=match.pk %}">Update Availability</a> |
-    <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
-    <a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
-    <a href="{% url 'club_detail' pk=match.club.pk %}">Back to Club</a>
-</body>
-</html>
+{% endwith %}
+
+{% if not match.match_players.all %}
+    <p>No team selected yet.</p>
+{% endif %}
+
+<hr>
+
+<!-- Squad Availability -->
+<h2>Available ({{ available_count }})</h2>
+{% for mp in match.match_players.all %}
+    {% if not mp.selected %}
+        <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+    {% endif %}
+{% endfor %}
+<hr>
+
+<!-- Set your availability -->
+<h3>Your Availability</h3>
+<a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}">Available</a> |
+<a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
+<a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a>
+<hr>
+
+<!-- Action links -->
+<a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a> |
+<a href="{% url 'bulk_availability' match_pk=match.pk %}">Update Availability</a> |
+<a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
+<a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
+<a href="{% url 'club_detail' pk=match.club.pk %}">Back to Club</a>
+{% endblock %}
