@@ -1,20 +1,52 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Welcome - MatchFeeMate{% endblock %}
+{% block title %}MatchFeeMate - Cricket Club Management{% endblock %}
 
 {% block content %}
-<!-- Page heading -->
-<h1>Welcome to MatchFeeMate</h1>
-
 {% if user.is_authenticated %}
     <!-- Logged in user without a club sees create option -->
-    <p>Hello, {{ user.email }}!</p>
-    <p>You're not part of a club yet. Create one to get started!</p>
-    <a href="{% url 'club_create' %}" class="btn btn-success">Create a Club</a>
+    <div class="text-center py-5">
+        <h1>Welcome, {{ user.email }}!</h1>
+        <p class="lead">You're not part of a club yet. Create one to get started!</p>
+        <a href="{% url 'club_create' %}" class="btn btn-mfm-primary btn-lg">Create a Club</a>
+    </div>
 {% else %}
-    <!-- Anonymous user sees description and auth links -->
-    <p>Manage your cricket club's match fees, availability, and team selection.</p>
-    <a href="{% url 'account_login' %}" class="btn btn-success me-2">Login</a>
-    <a href="{% url 'account_signup' %}" class="btn btn-outline-success">Sign Up</a>
+    <!-- Landing page for anonymous users -->
+    <div class="text-center pt-3 pb-5">
+    
+    <h2 class="display-4 fw-bold" style="color: #006400;">Love club cricket?</h2>
+    <p class="lead mb-2 fw-bold" style="color: #616161;">Feel like a second job?</p>
+    <p class="lead mb-4 fw-bold" style="color: #616161;">Less headaches. More eye of the tiger.</p>
+    <h3 class="fw-bold mb-2" style="color: #006400;">MatchFeeMate™</h3>
+    <img src="{% static 'clubs/images/batter.png' %}" alt="MatchFeeMate Logo" style="height: 140px;" class="mb-2">
+    <p class="lead fw-bold mb-4" style="color: #616161;">Match fees. Availability. Selection. Sorted.</p>
+    <a href="{% url 'account_signup' %}" class="btn btn-mfm-primary btn-lg">Get Started</a>
+</div>
+
+    <!-- Features section -->
+<div class="row mt-5 g-4">
+    <div class="col-md-4 text-center">
+        <img src="{% static 'clubs/images/YOUR_ICON.png' %}" alt="" style="height: 60px;" class="mb-2">
+        <h5 class="fw-bold" style="color: #006400;">Track Availability</h5>
+        <p class="text-muted fw-semibold">Players set their availability for each match. No more chasing people on WhatsApp.</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <img src="{% static 'clubs/images/YOUR_ICON.png' %}" alt="" style="height: 60px;" class="mb-2">
+        <h5 class="fw-bold" style="color: #006400;">Collect Match Fees</h5>
+        <p class="text-muted fw-semibold">Keep track of who's paid and who owes. No awkward conversations.</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <img src="{% static 'clubs/images/YOUR_ICON.png' %}" alt="" style="height: 60px;" class="mb-2">
+        <h5 class="fw-bold" style="color: #006400;">Select Your Team</h5>
+        <p class="text-muted fw-semibold">Pick your XI from available players. Team informed instantly.</p>
+    </div>
+</div>
+
+<!-- Call to action -->
+<div class="text-center mt-5 py-4">
+    <p class="mb-3 fw-bold" style="color: #006400;">Already have an account?</p>
+    <a href="{% url 'account_login' %}" class="btn btn-outline-success">Login</a>
+</div>
 {% endif %}
 {% endblock %}
