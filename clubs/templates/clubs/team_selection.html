@@ -1,59 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Select Team - MatchFeeMate</title>
-</head>
-<body>
-    <h1>Select Team</h1>
-    <h2>{{ match.club.name }} vs {{ match.opposition.name }} - {{ match.date }}</h2>
+{% extends 'clubs/base.html' %}
+
+{% block title %}Select Team - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<h1>Select Team</h1>
+<h2>{{ match.club.name }} vs {{ match.opposition.name }} - {{ match.date }}</h2>
+
+<form method="post">
+    {% csrf_token %}
     
-    <form method="post">
-        {% csrf_token %}
-        
-        <h3>Selected ({{ selected_players|length }})</h3>
-        {% for player in selected_players %}
-        <div>
-            <input type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
-            <label for="sel_{{ player.pk }}">{{ player.name }}</label>
-        </div>
-        {% empty %}
-        <p>No players selected yet.</p>
-        {% endfor %}
-        
-        <h3>Available ({{ available_players|length }})</h3>
-        {% for player in available_players %}
-        <div>
-            <input type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
-            <label for="avail_{{ player.pk }}">{{ player.name }}</label>
-        </div>
-        {% empty %}
-        <p>No players available.</p>
-        {% endfor %}
-        
-        <h3>Maybe ({{ maybe_players|length }})</h3>
-        {% for player in maybe_players %}
-        <div>
-            <input type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
-            <label for="maybe_{{ player.pk }}">{{ player.name }}</label>
-        </div>
-        {% empty %}
-        <p>No players with maybe status.</p>
-        {% endfor %}
-        
-        <h3>Not Available ({{ unavailable_players|length }})</h3>
-        {% for player in unavailable_players %}
-        <div>
-            <input type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
-            <label for="unavail_{{ player.pk }}">{{ player.name }}</label>
-        </div>
-        {% empty %}
-        <p>No players unavailable.</p>
-        {% endfor %}
-        
-        <br>
-        <button type="submit">Save Selection</button>
-    </form>
+    <!-- Currently selected players -->
+    <h3>Selected ({{ selected_players|length }})</h3>
+    {% for player in selected_players %}
+    <div>
+        <input type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
+        <label for="sel_{{ player.pk }}">{{ player.name }}</label>
+    </div>
+    {% empty %}
+    <p>No players selected yet.</p>
+    {% endfor %}
     
-    <a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
-</body>
-</html>
+    <!-- Available players -->
+    <h3>Available ({{ available_players|length }})</h3>
+    {% for player in available_players %}
+    <div>
+        <input type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
+        <label for="avail_{{ player.pk }}">{{ player.name }}</label>
+    </div>
+    {% empty %}
+    <p>No players available.</p>
+    {% endfor %}
+    
+    <!-- Maybe players -->
+    <h3>Maybe ({{ maybe_players|length }})</h3>
+    {% for player in maybe_players %}
+    <div>
+        <input type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
+        <label for="maybe_{{ player.pk }}">{{ player.name }}</label>
+    </div>
+    {% empty %}
+    <p>No players with maybe status.</p>
+    {% endfor %}
+    
+    <!-- Unavailable players -->
+    <h3>Not Available ({{ unavailable_players|length }})</h3>
+    {% for player in unavailable_players %}
+    <div>
+        <input type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
+        <label for="unavail_{{ player.pk }}">{{ player.name }}</label>
+    </div>
+    {% empty %}
+    <p>No players unavailable.</p>
+    {% endfor %}
+    
+    <br>
+    <button type="submit">Save Selection</button>
+</form>
+
+<a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
+{% endblock %}
