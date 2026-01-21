@@ -376,3 +376,30 @@ def bulk_availability(request, match_pk):
         'selected_players': selected_players,
         'other_players': other_players,
     })
+
+@login_required
+def match_list(request):
+    """List all matches for user's club"""
+    player = Player.objects.filter(user=request.user).first()
+    if not player:
+        return redirect('home')
+    
+    matches = Match.objects.filter(club=player.club).order_by('date')
+    return render(request, 'clubs/match_list.html', {
+        'matches': matches,
+        'club': player.club,
+    })
+
+
+@login_required
+def player_list(request):
+    """List all players for user's club"""
+    player = Player.objects.filter(user=request.user).first()
+    if not player:
+        return redirect('home')
+    
+    players = Player.objects.filter(club=player.club, is_active=True)
+    return render(request, 'clubs/player_list.html', {
+        'players': players,
+        'club': player.club,
+    })
