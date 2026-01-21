@@ -3,18 +3,46 @@
 {% block title %}{% if match %}Edit{% else %}Schedule{% endif %} Match - MatchFeeMate{% endblock %}
 
 {% block content %}
-<!-- Heading changes based on edit vs create -->
-<h1>{% if match %}Edit Match{% else %}Schedule Match for {{ club.name }}{% endif %}</h1>
+<!-- Page heading -->
+<h1 class="mb-3">{% if match %}Edit Match{% else %}Schedule Match{% endif %}</h1>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
-
-<a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+<div class="card card-mfm mb-3">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <!-- Action buttons -->
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-mfm-primary flex-fill">Save</button>
+                <a href="{% if match %}{% url 'match_detail' pk=match.pk %}{% else %}{% url 'club_detail' pk=club.pk %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
+    // Add Bootstrap form-control class to all inputs
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            el.classList.add('form-check-input');
+        } else {
+            el.classList.add('form-control');
+        }
+    });
+
     // Get form elements
     const isHomeRadios = document.querySelectorAll('input[name="is_home"]');
     const oppositionSelect = document.querySelector('select[name="opposition"]');
