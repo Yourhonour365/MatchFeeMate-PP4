@@ -1,16 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>MatchFeeMate</title>
-</head>
-<body>
-    <h1>Welcome to MatchFeeMate</h1>
-    {% if user.is_authenticated %}
-        <p>Hello, {{ user.email }}!</p>
-        <a href="{% url 'account_logout' %}">Logout</a>
-    {% else %}
-        <a href="{% url 'account_login' %}">Login</a> | 
-        <a href="{% url 'account_signup' %}">Sign Up</a>
-    {% endif %}
-</body>
-</html>
+{% extends 'clubs/base.html' %}
+
+{% block title %}Welcome - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<h1>Welcome to MatchFeeMate</h1>
+
+{% if user.is_authenticated %}
+    <!-- Logged in user sees greeting and link to clubs -->
+    <p>Hello, {{ user.email }}!</p>
+    <a href="{% url 'club_list' %}" class="btn btn-success">View Clubs</a>
+{% else %}
+    <!-- Anonymous user sees description and auth links -->
+    <p>Manage your cricket club's match fees, availability, and team selection.</p>
+    <a href="{% url 'account_login' %}" class="btn btn-success me-2">Login</a>
+    <a href="{% url 'account_signup' %}" class="btn btn-outline-success">Sign Up</a>
+{% endif %}
+{% endblock %}
