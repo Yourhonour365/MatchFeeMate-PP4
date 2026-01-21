@@ -317,6 +317,20 @@ def bulk_availability(request, match_pk):
     
     players = Player.objects.filter(club=match.club, is_active=True)
     
+    # Split players into selected and other
+    selected_players = []
+    other_players = []
+    
+    for player in players:
+        mp = match.match_players.filter(player=player).first()
+        player.current_availability = mp.get_availability_display() if mp else 'Not set'
+        player.is_selected = mp.selected if mp else False
+        
+        if player.is_selected:
+            selected_players.append(player)
+        else:
+            other_players.append(player)
+    
     if request.method == 'POST':
         selected_ids = request.POST.getlist('players')
         new_availability = request.POST.get('availability')
@@ -336,5 +350,6 @@ def bulk_availability(request, match_pk):
     
     return render(request, 'clubs/bulk_availability.html', {
         'match': match,
-        'players': players
+        'selected_players': selected_players,
+        'other_players': other_players,
     })

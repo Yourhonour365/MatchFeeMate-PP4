@@ -11,68 +11,25 @@
         {% csrf_token %}
         
         <h3>Selected Players</h3>
-        {% for player in players %}
-            {% for mp in match.match_players.all %}
-                {% if mp.player.pk == player.pk and mp.selected %}
-                <div>
-                    <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
-                    <label for="player_{{ player.pk }}">
-                        {{ player.name }} ({{ mp.get_availability_display }})
-                    </label>
-                </div>
-                {% endif %}
-            {% endfor %}
+        {% for player in selected_players %}
+        <div>
+            <input type="checkbox" name="players" value="{{ player.pk }}" id="selected_{{ player.pk }}">
+            <label for="selected_{{ player.pk }}">{{ player.name }}</label>
+        </div>
+        {% empty %}
+        <p>No players selected yet.</p>
         {% endfor %}
         
         <h3>Other Players</h3>
-        {% for player in players %}
-            {% with player_shown=False %}
-            {% for mp in match.match_players.all %}
-                {% if mp.player.pk == player.pk and mp.selected %}
-                    {% with player_shown=True %}{% endwith %}
-                {% endif %}
-            {% endfor %}
-            {% endwith %}
-        {% endfor %}
-        
-        {% for player in players %}
-            {% with is_selected=False %}
-                {% for mp in match.match_players.all %}
-                    {% if mp.player.pk == player.pk and mp.selected %}
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
-            
-            {% with has_record=False current_avail="" %}
-                {% for mp in match.match_players.all %}
-                    {% if mp.player.pk == player.pk %}
-                        {% if not mp.selected %}
-                        <div>
-                            <input type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
-                            <label for="other_{{ player.pk }}">
-                                {{ player.name }} ({{ mp.get_availability_display }})
-                            </label>
-                        </div>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
-        {% endfor %}
-        
-        {% for player in players %}
-            {% with has_mp=False %}
-                {% for mp in match.match_players.all %}
-                    {% if mp.player.pk == player.pk %}
-                        {% with has_mp=True %}{% endwith %}
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
-        {% endfor %}
-        
-        <!-- Players with no MatchPlayer record yet -->
-        {% for player in players %}
-            {% if not player.match_appearances.all or player not in match.match_players.all %}
-            {% endif %}
+        {% for player in other_players %}
+        <div>
+            <input type="checkbox" name="players" value="{{ player.pk }}" id="other_{{ player.pk }}">
+            <label for="other_{{ player.pk }}">
+                {{ player.name }} ({{ player.current_availability }})
+            </label>
+        </div>
+        {% empty %}
+        <p>No other players.</p>
         {% endfor %}
         
         <h3>Set Availability To</h3>
