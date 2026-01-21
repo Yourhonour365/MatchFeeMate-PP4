@@ -182,3 +182,17 @@ a:hover {
     border-color: #0D47A1;
     color: white;
 }
+/* === Card Header Styles === */
+.card-header-selected {
+    background-color: var(--mfm-turf-light);
+    color: var(--mfm-text-primary);
+}
+
+.card-header-available {
+    background-color: #BBDEFB;
+    color: var(--mfm-text-primary);
+}
+/* === Maybe status - darker amber for contrast === */
+.text-maybe {
+    color: #E65100;
+}

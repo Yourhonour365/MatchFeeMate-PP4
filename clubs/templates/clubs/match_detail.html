@@ -12,8 +12,8 @@
         
         <!-- Actions -->
         <div class="d-flex gap-2 mt-2">
-            <a href="#availability" class="btn btn-mfm-primary btn-sm">View Availability</a>
-            <a href="{% url 'match_update' pk=match.pk %}" class="btn btn-mfm-secondary btn-sm">Edit Match</a>
+            <a href="#availability" class="btn btn-mfm-dark-blue btn-sm">View Availability</a>
+            <a href="{% url 'match_update' pk=match.pk %}" class="btn btn-mfm-brown btn-sm">Edit Match</a>
         </div>
     </div>
 </div>
@@ -28,9 +28,9 @@
 
 <!-- Selected Team card -->
 <div class="card card-mfm mb-3">
-    <div class="card-header py-1 bg-success text-white d-flex justify-content-between align-items-center">
+    <div class="card-header py-1 card-header-selected d-flex justify-content-between align-items-center">
         <strong>Selected ({{ selected_count }}/11)</strong>
-        <a href="{% url 'team_selection' match_pk=match.pk %}" class="btn btn-light btn-sm py-0">Edit Selection</a>
+        <a href="{% url 'team_selection' match_pk=match.pk %}" class="btn btn-mfm-primary btn-sm py-0">Edit Selection</a>
     </div>
     <div class="card-body py-2">
         {% with selected=match.match_players.all|dictsort:"player.name" %}
@@ -38,7 +38,7 @@
                 {% if mp.selected %}
                 <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
                     <span>{{ mp.player.name }}</span>
-                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-maybe{% endif %}">
                         {{ mp.get_availability_display }}
                     </small>
                 </div>
@@ -53,9 +53,9 @@
 
 <!-- Available Players card - prominent for captain -->
 <div class="card card-mfm mb-3" id="availability">
-    <div class="card-header py-1 bg-primary text-white d-flex justify-content-between align-items-center">
+    <div class="card-header py-1 card-header-available d-flex justify-content-between align-items-center">
         <strong>Available ({{ available_count }})</strong>
-        <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-success btn-sm py-0">Edit Availability</a>
+        <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-mfm-dark-blue btn-sm py-0">Edit Availability</a>
     </div>
     <div class="card-body py-2">
         {% for mp in match.match_players.all|dictsort:"player.name" %}
@@ -80,7 +80,7 @@
             {% if not mp.selected and mp.availability != 'yes' %}
             <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
                 <span>{{ mp.player.name }}</span>
-                <small class="{% if mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                <small class="{% if mp.availability == 'no' %}text-danger{% else %}text-maybe{% endif %}">
                     {{ mp.get_availability_display }}
                 </small>
             </div>
@@ -94,9 +94,9 @@
     <div class="card-body py-2">
         <strong class="small">Your Availability:</strong>
         <div class="d-flex gap-2 mt-1">
-            <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill">Available</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-warning btn-sm flex-fill">Maybe</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill">Not Available</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill d-flex align-items-center justify-content-center">Available</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-warning btn-sm flex-fill d-flex align-items-center justify-content-center">Maybe</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill d-flex align-items-center justify-content-center">Not Available</a>
         </div>
     </div>
 </div>
