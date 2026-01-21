@@ -14,9 +14,20 @@
     <p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
     <p><strong>Status:</strong> {{ match.get_status_display }}</p>
     <hr>
+    <p><strong>Status:</strong> {{ match.get_status_display }}</p>
+    <hr>
     
+    {% if unavailable_selected %}
+    <p style="color: red;"><strong>Warning:</strong> These selected players are not available:</p>
+    <ul>
+    {% for mp in unavailable_selected %}
+        <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+    {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
     
-    
+        
     <!-- Selected Team -->
     <h2>Selected Team ({{ selected_count }}/11)</h2>
     {% with selected=match.match_players.all %}

@@ -214,10 +214,14 @@ def match_detail(request, pk):
     selected_count = match_players.filter(selected=True).count()
     available_count = match_players.filter(availability='yes', selected=False).count()
     
+    # Warning: selected but not available
+    unavailable_selected = match_players.filter(selected=True).exclude(availability='yes')
+    
     return render(request, 'clubs/match_detail.html', {
         'match': match,
         'selected_count': selected_count,
         'available_count': available_count,
+        'unavailable_selected': unavailable_selected,
     })
 
 
