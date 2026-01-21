@@ -19,9 +19,7 @@
             <!-- Match header: date and home/away badge -->
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold">{{ match.date|date:"D d M" }}</span>
-                <span class="badge {% if match.is_home %}bg-success{% else %}bg-secondary{% endif %}">
-                    {% if match.is_home %}Home{% else %}Away{% endif %}
-                </span>
+                <small class="text-muted">({% if match.is_home %}Home{% else %}Away{% endif %})</small>
             </div>
             <!-- Opposition name -->
             <h5 class="card-title mb-2">vs {{ match.opposition.name }}</h5>
@@ -36,9 +34,9 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <span class="small">
                     <strong>My status:</strong>
-                    <span class="badge {% if match.my_availability == 'yes' %}bg-success{% elif match.my_availability == 'no' %}bg-danger{% elif match.my_availability == 'maybe' %}bg-warning text-dark{% else %}bg-light text-dark{% endif %}">
+                    <small class="{% if match.my_availability == 'yes' %}text-success fw-bold{% elif match.my_availability == 'no' %}text-danger fw-bold{% elif match.my_availability == 'maybe' %}text-warning fw-bold{% else %}text-muted{% endif %}">
                         {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Not Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
-                    </span>
+                    </small>
                 </span>
                 <div class="btn-group btn-group-sm">
                     <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}?next={% url 'match_list' %}" class="btn btn-outline-success btn-sm {% if match.my_availability == 'yes' %}active{% endif %}">✓</a>
