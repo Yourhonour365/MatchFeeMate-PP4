@@ -46,7 +46,8 @@ class Player(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.club.name})"
-    
+
+
 class Opposition(models.Model):
     """Opposition teams that the club plays against"""
     
@@ -58,19 +59,15 @@ class Opposition(models.Model):
     
     def __str__(self):
         return self.name
-    
+
 
 class Match(models.Model):
     """A scheduled cricket match"""
     
-    def available_count(self):
-        """Count players who are available"""
-        return self.match_players.filter(availability='yes').count()
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
-        
     ]
     
     club = models.ForeignKey(
@@ -94,6 +91,29 @@ class Match(models.Model):
     def __str__(self):
         return f"{self.club.name} vs {self.opposition.name} - {self.date}"
     
+    def selected_count(self):
+        """Count players who are selected"""
+        return self.match_players.filter(selected=True).count()
+    
+    def available_count(self):
+        """Count players who are available"""
+        return self.match_players.filter(availability='yes').count()
+    
+    def maybe_count(self):
+        """Count players who are maybe"""
+        return self.match_players.filter(availability='maybe').count()
+    
+    def unavailable_count(self):
+        """Count players who are not available"""
+        return self.match_players.filter(availability='no').count()
+    
+    def awaiting_count(self):
+        """Count players with no response yet"""
+        total_players = self.club.players.filter(is_active=True).count()
+        responded = self.match_players.count()
+        return total_players - responded
+
+
 class MatchPlayer(models.Model):
     """Links players to matches - tracks availability and selection"""
     
@@ -115,7 +135,7 @@ class MatchPlayer(models.Model):
     selected = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = ['match', 'player']  # Player can only appear once per match
+        unique_together = ['match', 'player']
     
     def __str__(self):
-        return f"{self.player.name} - {self.match}"  
+        return f"{self.player.name} - {self.match}"

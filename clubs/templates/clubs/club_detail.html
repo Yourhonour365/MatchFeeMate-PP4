@@ -62,24 +62,43 @@
     <a href="{% url 'match_create' club_pk=club.pk %}">Schedule Match</a>
     
     {% if club.matches.all %}
-        <ul>
+    <table border="1" cellpadding="5" style="margin-top: 10px;">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Opposition</th>
+            <th>H/A</th>
+            <th>Selected</th>
+            <th>Available</th>
+            <th>Maybe</th>
+            <th>Unavail</th>
+            <th>Awaiting</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
         {% for match in club.matches.all %}
-            <li>
-                {{ match.date }} {{ match.time|default:"" }} v {{ match.opposition.name }}
-                ({% if match.is_home %}H{% else %}A{% endif %})
-                - ({{ match.available_count }} avail')
-                - <a href="{% url 'match_detail' pk=match.pk %}">View</a>
-                - <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a>
-                - <a href="{% url 'bulk_availability' match_pk=match.pk %}">Update Availability</a>
-                - <a href="{% url 'match_update' pk=match.pk %}">Edit</a>
-                - <a href="{% url 'match_delete' pk=match.pk %}">Delete</a>
-            </li>
+        <tr>
+            <td>{{ match.date }}</td>
+            <td>{{ match.time|default:"TBC" }}</td>
+            <td>{{ match.opposition.name }}</td>
+            <td>{% if match.is_home %}H{% else %}A{% endif %}</td>
+            <td>{{ match.selected_count }}</td>
+            <td>{{ match.available_count }}</td>
+            <td>{{ match.maybe_count }}</td>
+            <td>{{ match.unavailable_count }}</td>
+            <td>{{ match.awaiting_count }}</td>
+            <td>{{ match.get_status_display }}</td>
+            <td>
+                <a href="{% url 'match_detail' pk=match.pk %}">View</a> |
+                <a href="{% url 'team_selection' match_pk=match.pk %}">Select</a> |
+                <a href="{% url 'bulk_availability' match_pk=match.pk %}">Availability</a>
+            </td>
+        </tr>
         {% endfor %}
-        </ul>
+    </table>
     {% else %}
         <p>No matches scheduled.</p>
     {% endif %}
-
 
 
 
