@@ -1,63 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% if match %}Edit{% else %}Schedule{% endif %} Match - MatchFeeMate</title>
-</head>
-<body>
-    <h1>{% if match %}Edit Match{% else %}Schedule Match for {{ club.name }}{% endif %}</h1>
+{% extends 'clubs/base.html' %}
+
+{% block title %}{% if match %}Edit{% else %}Schedule{% endif %} Match - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Heading changes based on edit vs create -->
+<h1>{% if match %}Edit Match{% else %}Schedule Match for {{ club.name }}{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+
+<script>
+    // Get form elements
+    const isHomeRadios = document.querySelectorAll('input[name="is_home"]');
+    const oppositionSelect = document.querySelector('select[name="opposition"]');
+    const venueInput = document.querySelector('input[name="venue"]');
+    const homeGround = "{{ club.home_ground|escapejs }}";
     
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
+    // Opposition home grounds
+    const oppGrounds = {
+        {% for opp in club.oppositions.all %}
+        "{{ opp.pk }}": "{{ opp.home_ground|escapejs }}",
+        {% endfor %}
+    };
     
-    <a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+    // Check if home match selected
+    function isHome() {
+        const checked = document.querySelector('input[name="is_home"]:checked');
+        return checked && checked.value === 'True';
+    }
     
-    <script>
-        // Get form elements
-        const isHomeRadios = document.querySelectorAll('input[name="is_home"]');
-        const oppositionSelect = document.querySelector('select[name="opposition"]');
-        const venueInput = document.querySelector('input[name="venue"]');
-        const homeGround = "{{ club.home_ground|escapejs }}";
-        
-        // Opposition home grounds
-        const oppGrounds = {
-            {% for opp in club.oppositions.all %}
-            "{{ opp.pk }}": "{{ opp.home_ground|escapejs }}",
-            {% endfor %}
-        };
-        
-        function isHome() {
-            const checked = document.querySelector('input[name="is_home"]:checked');
-            return checked && checked.value === 'True';
-        }
-        
-        function updateVenue() {
-            if (venueInput.value.trim() === '') {
-                if (isHome()) {
-                    venueInput.value = homeGround;
-                } else if (oppositionSelect.value) {
-                    venueInput.value = oppGrounds[oppositionSelect.value] || '';
-                }
+    // Auto-fill venue based on home/away and opposition
+    function updateVenue() {
+        if (venueInput.value.trim() === '') {
+            if (isHome()) {
+                venueInput.value = homeGround;
+            } else if (oppositionSelect.value) {
+                venueInput.value = oppGrounds[oppositionSelect.value] || '';
             }
         }
-        
-        isHomeRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                venueInput.value = '';
-                updateVenue();
-            });
+    }
+    
+    // Listen for home/away change
+    isHomeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            venueInput.value = '';
+            updateVenue();
         });
-        
-        oppositionSelect.addEventListener('change', function() {
-            if (!isHome()) {
-                venueInput.value = '';
-                updateVenue();
-            }
-        });
-        // Auto-fill on page load
-        updateVenue();
-    </script>
-</body>
-</html>
+    });
+    
+    // Listen for opposition change
+    oppositionSelect.addEventListener('change', function() {
+        if (!isHome()) {
+            venueInput.value = '';
+            updateVenue();
+        }
+    });
+    
+    // Auto-fill on page load
+    updateVenue();
+</script>
+{% endblock %}
