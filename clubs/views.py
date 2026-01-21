@@ -198,7 +198,7 @@ def match_create(request, club_pk):
             match.save()
             return redirect('match_detail', pk=match.pk)
     else:
-        form = MatchForm()
+        form = MatchForm(initial={'match_fee': club.default_match_fee})
         # Only show opposition teams for this club
         form.fields['opposition'].queryset = Opposition.objects.filter(club=club)
     return render(request, 'clubs/match_form.html', {'form': form, 'club': club})
