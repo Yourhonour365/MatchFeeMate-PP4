@@ -1,18 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Delete {{ player.name }} - MatchFeeMate</title>
-</head>
-<body>
-    <h1>Delete {{ player.name }}?</h1>
-    
-    <p>Are you sure you want to remove this player from {{ player.club.name }}?</p>
-    
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes, delete</button>
-    </form>
-    
-    <a href="{% url 'club_detail' pk=player.club.pk %}">Cancel</a>
-</body>
-</html>
+{% extends 'clubs/base.html' %}
+
+{% block title %}Delete {{ player.name }} - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<h1>Delete {{ player.name }}?</h1>
+
+<p>Are you sure you want to remove this player from {{ player.club.name }}?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+</form>
+
+<a href="{% url 'club_detail' pk=player.club.pk %}">Cancel</a>
+{% endblock %}
