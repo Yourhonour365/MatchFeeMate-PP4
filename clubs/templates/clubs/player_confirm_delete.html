@@ -4,14 +4,20 @@
 
 {% block content %}
 <!-- Page heading -->
-<h1>Delete {{ player.name }}?</h1>
+<h1 class="mb-3">Delete Player?</h1>
 
-<p>Are you sure you want to remove this player from {{ player.club.name }}?</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-</form>
-
-<a href="{% url 'club_detail' pk=player.club.pk %}">Cancel</a>
+<div class="card card-mfm mb-3">
+    <div class="card-body">
+        <p>Are you sure you want to remove <strong>{{ player.name }}</strong> from {{ player.club.name }}?</p>
+        <p class="text-danger small">This action cannot be undone.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-mfm-danger flex-fill">Yes, Delete</button>
+                <a href="{% url 'player_list' %}" class="btn btn-outline-secondary flex-fill">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
