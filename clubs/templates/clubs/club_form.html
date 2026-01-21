@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Title changes based on whether we're editing or creating -->
-    <title>{% if club %}Edit{% else %}Create{% endif %} Club - MatchFeeMate</title>
-</head>
-<body>
-    <!-- Heading changes based on edit vs create -->
-    <h1>{% if club %}Edit {{ club.name }}{% else %}Create New Club{% endif %}</h1>
-    
-    <form method="post">
-        <!-- csrf_token protects against cross-site request forgery attacks - Django requires this -->
-        {% csrf_token %}
-        <!-- as_p renders each form field wrapped in <p> tags -->
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-    
-    <a href="{% url 'home' %}">Cancel</a>
-</body>
-</html>
+{% extends 'clubs/base.html' %}
+
+{% block title %}{% if club %}Edit{% else %}Create{% endif %} Club - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Heading changes based on edit vs create -->
+<h1>{% if club %}Edit {{ club.name }}{% else %}Create New Club{% endif %}</h1>
+
+<form method="post">
+    <!-- csrf_token protects against cross-site request forgery attacks - Django requires this -->
+    {% csrf_token %}
+    <!-- as_p renders each form field wrapped in <p> tags -->
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'home' %}">Cancel</a>
+{% endblock %}
