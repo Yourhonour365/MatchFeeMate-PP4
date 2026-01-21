@@ -1,0 +1,40 @@
+{% extends 'clubs/base.html' %}
+
+{% block title %}Matches - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Matches</h1>
+    <a href="{% url 'match_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Schedule Match</a>
+</div>
+
+{% if matches %}
+    {% for match in matches %}
+    <!-- Match card - mobile friendly -->
+    <div class="card card-mfm mb-3">
+        <div class="card-body">
+            <!-- Match header: date and home/away badge -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">{{ match.date|date:"D d M" }}</span>
+                <span class="badge {% if match.is_home %}bg-success{% else %}bg-secondary{% endif %}">
+                    {% if match.is_home %}Home{% else %}Away{% endif %}
+                </span>
+            </div>
+            <!-- Opposition name -->
+            <h5 class="card-title mb-2">vs {{ match.opposition.name }}</h5>
+            <!-- Match stats row -->
+            <div class="d-flex justify-content-between text-muted mb-3">
+                <span>Selected: {{ match.selected_count }}/11</span>
+                <span>Available: {{ match.available_count }}</span>
+                <span>{{ match.get_status_display }}</span>
+            </div>
+            <!-- Action button -->
+            <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm w-100">View Match</a>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No matches scheduled.</p>
+{% endif %}
+{% endblock %}

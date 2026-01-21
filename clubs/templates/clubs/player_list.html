@@ -1,0 +1,30 @@
+{% extends 'clubs/base.html' %}
+
+{% block title %}Players - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Players</h1>
+    <a href="{% url 'player_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Player</a>
+</div>
+
+{% if players %}
+    {% for player in players %}
+    <div class="card card-mfm mb-2">
+        <div class="card-body py-2 d-flex justify-content-between align-items-center">
+            <span>
+                {{ player.name }}
+                {% if player.role != 'player' %}<span class="badge bg-secondary ms-2">{{ player.get_role_display }}</span>{% endif %}
+            </span>
+            <div>
+                <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
+                <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No players yet.</p>
+{% endif %}
+{% endblock %}
