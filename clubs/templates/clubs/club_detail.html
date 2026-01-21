@@ -70,6 +70,7 @@
                 - ({{ match.available_count }} avail')
                 - <a href="{% url 'match_detail' pk=match.pk %}">View</a>
                 - <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a>
+                - <a href="{% url 'bulk_availability' match_pk=match.pk %}">Update Availability</a>
                 - <a href="{% url 'match_update' pk=match.pk %}">Edit</a>
                 - <a href="{% url 'match_delete' pk=match.pk %}">Delete</a>
             </li>
