@@ -1,18 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Delete Match - MatchFeeMate</title>
-</head>
-<body>
-    <h1>Delete Match?</h1>
-    
-    <p>Are you sure you want to delete the match against {{ match.opposition.name }} on {{ match.date }}?</p>
-    
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes, delete</button>
-    </form>
-    
-    <a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
-</body>
-</html>
+{% extends 'clubs/base.html' %}
+
+{% block title %}Delete Match - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Page heading -->
+<h1>Delete Match?</h1>
+
+<p>Are you sure you want to delete the match against {{ match.opposition.name }} on {{ match.date }}?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+</form>
+
+<a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
+{% endblock %}
