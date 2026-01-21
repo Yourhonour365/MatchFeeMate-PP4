@@ -10,39 +10,21 @@
     <form method="post">
         {% csrf_token %}
         
-        <h3>Selected Players</h3>
+        <h3>All Players</h3>
         {% for player in players %}
-            {% for mp in match.match_players.all %}
-                {% if mp.player.pk == player.pk and mp.selected %}
-                <div>
-                    <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
-                    <label for="player_{{ player.pk }}">
-                        {{ player.name }} ({{ mp.get_availability_display }})
-                    </label>
-                </div>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-        
-        <h3>Squad</h3>
-        {% for player in players %}
-            {% with is_selected=False %}
+        <div>
+            <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
+            <label for="player_{{ player.pk }}">
+                {{ player.name }}
                 {% for mp in match.match_players.all %}
-                    {% if mp.player.pk == player.pk and mp.selected %}
+                    {% if mp.player.pk == player.pk %}
+                        ({{ mp.get_availability_display }}{% if mp.selected %}, Selected{% endif %})
                     {% endif %}
                 {% endfor %}
-            {% endwith %}
-            {% for mp in match.match_players.all %}
-                {% if mp.player.pk == player.pk and not mp.selected %}
-                <div>
-                    <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
-                    <label for="player_{{ player.pk }}">
-                        {{ player.name }} ({{ mp.get_availability_display }})
-                    </label>
-                </div>
-                {% endif %}
-            {% empty %}
-            {% endfor %}
+            </label>
+        </div>
+        {% empty %}
+        <p>No players in this club.</p>
         {% endfor %}
         
         <h3>Set Availability To</h3>

@@ -65,9 +65,8 @@
         <ul>
         {% for match in club.matches.all %}
             <li>
-                {{ match.date }} {{ match.time|default:"" }} - vs {{ match.opposition.name }}
+                {{ match.date }} {{ match.time|default:"" }} v {{ match.opposition.name }}
                 ({% if match.is_home %}H{% else %}A{% endif %})
-                - {{ match.get_status_display }}
                 - ({{ match.available_count }} avail')
                 - <a href="{% url 'match_detail' pk=match.pk %}">View</a>
                 - <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a>
