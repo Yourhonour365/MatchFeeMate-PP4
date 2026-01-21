@@ -302,3 +302,35 @@ def team_selection(request, match_pk):
         'match': match,
         'players': players
     })
+
+@login_required
+def bulk_availability(request, match_pk):
+    """Admin updates multiple players' availability at once"""
+    match = get_object_or_404(Match, pk=match_pk)
+    # Permission check - only admin/captain can update availability
+    if not match.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    
+    players = Player.objects.filter(club=match.club, is_active=True)
+    
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('players')
+        new_availability = request.POST.get('availability')
+        
+        for player_id in selected_ids:
+            player = Player.objects.get(pk=player_id)
+            match_player, created = MatchPlayer.objects.get_or_create(
+                match=match,
+                player=player,
+                defaults={'availability': new_availability}
+            )
+            if not created:
+                match_player.availability = new_availability
+                match_player.save()
+        
+        return redirect('match_detail', pk=match_pk)
+    
+    return render(request, 'clubs/bulk_availability.html', {
+        'match': match,
+        'players': players
+    })

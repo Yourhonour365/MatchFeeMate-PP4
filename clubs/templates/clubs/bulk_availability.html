@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Availability - MatchFeeMate</title>
+</head>
+<body>
+    <h1>Update Availability</h1>
+    <h2>{{ match.club.name }} vs {{ match.opposition.name }} - {{ match.date }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <h3>Selected Players</h3>
+        {% for player in players %}
+            {% for mp in match.match_players.all %}
+                {% if mp.player.pk == player.pk and mp.selected %}
+                <div>
+                    <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
+                    <label for="player_{{ player.pk }}">
+                        {{ player.name }} ({{ mp.get_availability_display }})
+                    </label>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        
+        <h3>Squad</h3>
+        {% for player in players %}
+            {% with is_selected=False %}
+                {% for mp in match.match_players.all %}
+                    {% if mp.player.pk == player.pk and mp.selected %}
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+            {% for mp in match.match_players.all %}
+                {% if mp.player.pk == player.pk and not mp.selected %}
+                <div>
+                    <input type="checkbox" name="players" value="{{ player.pk }}" id="player_{{ player.pk }}">
+                    <label for="player_{{ player.pk }}">
+                        {{ player.name }} ({{ mp.get_availability_display }})
+                    </label>
+                </div>
+                {% endif %}
+            {% empty %}
+            {% endfor %}
+        {% endfor %}
+        
+        <h3>Set Availability To</h3>
+        <select name="availability" required>
+            <option value="yes">Available</option>
+            <option value="no">Not Available</option>
+            <option value="maybe">Maybe</option>
+        </select>
+        
+        <br><br>
+        <button type="submit">Update Selected</button>
+    </form>
+    
+    <br>
+    <a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
+</body>
+</html>

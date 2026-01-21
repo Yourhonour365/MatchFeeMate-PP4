@@ -27,4 +27,6 @@ urlpatterns = [
     path('match/<int:match_pk>/availability/<str:availability>/', views.set_availability, name='set_availability'),
     # Team selection
     path('match/<int:match_pk>/select/', views.team_selection, name='team_selection'),
+    # Bulk availability update
+    path('match/<int:match_pk>/bulk-availability/', views.bulk_availability, name='bulk_availability'),
 ]
