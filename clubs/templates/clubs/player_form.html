@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{% if player %}Edit{% else %}Add{% endif %} Player - MatchFeeMate</title>
-</head>
-<body>
-    <h1>{% if player %}Edit {{ player.name }}{% else %}Add Player to {{ club.name }}{% endif %}</h1>
-    
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-    
-    <a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
-</body>
-</html>
+{% extends 'clubs/base.html' %}
+
+{% block title %}{% if player %}Edit{% else %}Add{% endif %} Player - MatchFeeMate{% endblock %}
+
+{% block content %}
+<!-- Heading changes based on edit vs create -->
+<h1>{% if player %}Edit {{ player.name }}{% else %}Add Player to {{ club.name }}{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+{% endblock %}
