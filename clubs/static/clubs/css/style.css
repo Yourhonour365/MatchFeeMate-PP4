@@ -1,0 +1,134 @@
+/* MatchFeeMate Custom Styles
+   Colour palette v2.0
+*/
+
+/* === Brand Greens (Primary) === */
+:root {
+    --mfm-deep-forest: #0A230C;
+    --mfm-deep-turf: #006400;
+    --mfm-turf-green: #228B22;
+    --mfm-turf-highlight: #32CD32;
+    --mfm-turf-light: #C8E6C9;
+    --mfm-turf-tint: #E8F5E9;
+    
+    /* Canvas / Backgrounds */
+    --mfm-cream-white: #FFFEF9;
+    --mfm-off-white: #FBF8F3;
+    --mfm-warm-grey: #F5F2EB;
+    --mfm-cream: #EDE8DF;
+    --mfm-warm-sand: #E5DFD3;
+    --mfm-deep-sand: #D7CCC8;
+    
+    /* Browns (Tertiary / Disabled) */
+    --mfm-warm-stone: #BCAAA4;
+    --mfm-canvas-dark: #A1887F;
+    --mfm-brown-400: #8D6E63;
+    --mfm-brown-600: #6D4C41;
+    
+    /* Reds / Errors */
+    --mfm-error-tint: #FFEBEE;
+    --mfm-error-light: #FFCDD2;
+    --mfm-error-red: #F44336;
+    --mfm-red-600: #E53935;
+    --mfm-error-dark: #D32F2F;
+    --mfm-red-800: #C62828;
+    
+    /* Text Hierarchy */
+    --mfm-text-primary: #212121;
+    --mfm-text-secondary: #424242;
+    --mfm-text-medium: #616161;
+    --mfm-text-placeholder: #9E9E9E;
+    --mfm-text-disabled: #BDBDBD;
+}
+
+/* === Page Background === */
+body {
+    background-color: var(--mfm-cream-white);
+    color: var(--mfm-text-primary);
+}
+
+/* === Navbar === */
+.navbar-mfm {
+    background-color: var(--mfm-deep-turf);
+}
+
+/* === Buttons === */
+.btn-mfm-primary {
+    background-color: var(--mfm-deep-turf);
+    border-color: var(--mfm-deep-turf);
+    color: white;
+}
+
+.btn-mfm-primary:hover {
+    background-color: var(--mfm-turf-green);
+    border-color: var(--mfm-turf-green);
+    color: white;
+}
+
+.btn-mfm-secondary {
+    background-color: var(--mfm-turf-green);
+    border-color: var(--mfm-turf-green);
+    color: white;
+}
+
+.btn-mfm-secondary:hover {
+    background-color: var(--mfm-deep-turf);
+    border-color: var(--mfm-deep-turf);
+    color: white;
+}
+
+.btn-mfm-danger {
+    background-color: var(--mfm-red-600);
+    border-color: var(--mfm-red-600);
+    color: white;
+}
+
+.btn-mfm-danger:hover {
+    background-color: var(--mfm-red-800);
+    border-color: var(--mfm-red-800);
+    color: white;
+}
+
+/* === Cards === */
+.card-mfm {
+    background-color: var(--mfm-warm-grey);
+    border: 1px solid var(--mfm-warm-sand);
+}
+
+/* === Tables === */
+.table-mfm thead {
+    background-color: var(--mfm-deep-turf);
+    color: white;
+}
+
+.table-mfm tbody tr:nth-child(even) {
+    background-color: var(--mfm-off-white);
+}
+
+/* === Form Inputs === */
+.form-control:focus {
+    border-color: var(--mfm-turf-green);
+    box-shadow: 0 0 0 0.2rem rgba(34, 139, 34, 0.25);
+}
+
+/* === Links === */
+a {
+    color: var(--mfm-deep-turf);
+}
+
+a:hover {
+    color: var(--mfm-turf-green);
+}
+
+/* === Success/Error States === */
+.alert-mfm-success {
+    background-color: var(--mfm-turf-tint);
+    border-color: var(--mfm-turf-light);
+    color: var(--mfm-deep-forest);
+}
+
+.alert-mfm-error {
+    background-color: var(--mfm-error-tint);
+    border-color: var(--mfm-error-light);
+    color: var(--mfm-error-dark);
+}
