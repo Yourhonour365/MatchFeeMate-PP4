@@ -323,7 +323,7 @@ def bulk_availability(request, match_pk):
     
     for player in players:
         mp = match.match_players.filter(player=player).first()
-        player.current_availability = mp.get_availability_display() if mp else 'Not set'
+        player.current_availability = mp.get_availability_display() if mp else 'Awaiting response'
         player.is_selected = mp.selected if mp else False
         
         if player.is_selected:
