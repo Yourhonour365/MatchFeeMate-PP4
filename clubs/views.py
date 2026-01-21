@@ -289,6 +289,26 @@ def team_selection(request, match_pk):
     # Get all players and their availability for this match
     players = Player.objects.filter(club=match.club, is_active=True)
     
+    # Split players into categories
+    selected_players = []
+    available_players = []
+    maybe_players = []
+    unavailable_players = []
+    
+    for player in players:
+        mp = match.match_players.filter(player=player).first()
+        player.is_selected = mp.selected if mp else False
+        player.availability = mp.availability if mp else 'maybe'
+        
+        if player.is_selected:
+            selected_players.append(player)
+        elif player.availability == 'yes':
+            available_players.append(player)
+        elif player.availability == 'maybe':
+            maybe_players.append(player)
+        else:
+            unavailable_players.append(player)
+    
     if request.method == 'POST':
         selected_ids = request.POST.getlist('selected')
         # Update all match_players for this match
@@ -304,7 +324,10 @@ def team_selection(request, match_pk):
     
     return render(request, 'clubs/team_selection.html', {
         'match': match,
-        'players': players
+        'selected_players': selected_players,
+        'available_players': available_players,
+        'maybe_players': maybe_players,
+        'unavailable_players': unavailable_players,
     })
 
 @login_required

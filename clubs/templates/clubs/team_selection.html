@@ -9,32 +9,48 @@
     
     <form method="post">
         {% csrf_token %}
-        <table>
-            <tr>
-                <th>Select</th>
-                <th>Player</th>
-                <th>Availability</th>
-            </tr>
-            {% for player in players %}
-            <tr>
-                <td>
-                    <input type="checkbox" name="selected" value="{{ player.pk }}"
-                        {% for mp in match.match_players.all %}
-                            {% if mp.player.pk == player.pk and mp.selected %}checked{% endif %}
-                        {% endfor %}
-                    >
-                </td>
-                <td>{{ player.name }}</td>
-                <td>
-                    {% for mp in match.match_players.all %}
-                        {% if mp.player.pk == player.pk %}
-                            {{ mp.get_availability_display }}
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+        
+        <h3>Selected ({{ selected_players|length }})</h3>
+        {% for player in selected_players %}
+        <div>
+            <input type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
+            <label for="sel_{{ player.pk }}">{{ player.name }}</label>
+        </div>
+        {% empty %}
+        <p>No players selected yet.</p>
+        {% endfor %}
+        
+        <h3>Available ({{ available_players|length }})</h3>
+        {% for player in available_players %}
+        <div>
+            <input type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
+            <label for="avail_{{ player.pk }}">{{ player.name }}</label>
+        </div>
+        {% empty %}
+        <p>No players available.</p>
+        {% endfor %}
+        
+        <h3>Maybe ({{ maybe_players|length }})</h3>
+        {% for player in maybe_players %}
+        <div>
+            <input type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
+            <label for="maybe_{{ player.pk }}">{{ player.name }}</label>
+        </div>
+        {% empty %}
+        <p>No players with maybe status.</p>
+        {% endfor %}
+        
+        <h3>Not Available ({{ unavailable_players|length }})</h3>
+        {% for player in unavailable_players %}
+        <div>
+            <input type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
+            <label for="unavail_{{ player.pk }}">{{ player.name }}</label>
+        </div>
+        {% empty %}
+        <p>No players unavailable.</p>
+        {% endfor %}
+        
+        <br>
         <button type="submit">Save Selection</button>
     </form>
     
