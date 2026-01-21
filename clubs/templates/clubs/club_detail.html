@@ -4,106 +4,110 @@
 
 {% block content %}
 <!-- Club heading and details -->
-<h1>{{ club.name }}</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>{{ club.name }}</h1>
+    <!-- Club action buttons -->
+    <div>
+        <a href="{% url 'club_update' pk=club.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
+        <a href="{% url 'club_delete' pk=club.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
+    </div>
+</div>
 
-<p><strong>Home Ground:</strong> {{ club.home_ground|default:"Not set" }}</p>
-<p><strong>Default Match Fee:</strong> £{{ club.default_match_fee }}</p>
-<p><strong>Created by:</strong> {{ club.created_by.email }}</p>
-
-<!-- Action links -->
-<a href="{% url 'club_update' pk=club.pk %}">Edit</a> |
-<a href="{% url 'club_delete' pk=club.pk %}">Delete</a>
-
-<hr>
+<!-- Club info card -->
+<div class="card card-mfm mb-4">
+    <div class="card-body">
+        <p class="mb-1"><strong>Home Ground:</strong> {{ club.home_ground|default:"Not set" }}</p>
+        <p class="mb-1"><strong>Default Match Fee:</strong> £{{ club.default_match_fee }}</p>
+        <p class="mb-0"><strong>Created by:</strong> {{ club.created_by.email }}</p>
+    </div>
+</div>
 
 <!-- Players section -->
-<h2>Players</h2>
-<a href="{% url 'player_create' club_pk=club.pk %}">Add Player</a>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2>Players</h2>
+    <a href="{% url 'player_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Player</a>
+</div>
 
 {% if club.players.all %}
-    <ul>
+    <ul class="list-group mb-4">
     {% for player in club.players.all %}
-        <li>
-            {{ player.name }} ({{ player.get_role_display }})
-            - <a href="{% url 'player_update' pk=player.pk %}">Edit</a>
-            - <a href="{% url 'player_delete' pk=player.pk %}">Delete</a>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                {{ player.name }}
+                {% if player.role != 'player' %}<span class="badge bg-secondary ms-2">{{ player.get_role_display }}</span>{% endif %}
+            </span>
+            <div>
+                <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
+                <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
+            </div>
         </li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No players yet.</p>
+    <p class="text-muted mb-4">No players yet.</p>
 {% endif %}
-
-<hr>
 
 <!-- Opposition section -->
-<h2>Opposition Teams</h2>
-<a href="{% url 'opposition_create' club_pk=club.pk %}">Add Opposition</a>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2>Opposition Teams</h2>
+    <a href="{% url 'opposition_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Add Opposition</a>
+</div>
 
 {% if club.oppositions.all %}
-    <ul>
+    <ul class="list-group mb-4">
     {% for opp in club.oppositions.all %}
-        <li>
-            {{ opp.name }} {% if opp.home_ground %}({{ opp.home_ground }}){% endif %}
-            - <a href="{% url 'opposition_update' pk=opp.pk %}">Edit</a>
-            - <a href="{% url 'opposition_delete' pk=opp.pk %}">Delete</a>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ opp.name }}</span>
+            <div>
+                <a href="{% url 'opposition_update' pk=opp.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
+                <a href="{% url 'opposition_delete' pk=opp.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
+            </div>
         </li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No opposition teams yet.</p>
+    <p class="text-muted mb-4">No opposition teams yet.</p>
 {% endif %}
-
-<hr>
 
 <!-- Matches section -->
-<h2>Matches</h2>
-<a href="{% url 'match_create' club_pk=club.pk %}">Schedule Match</a>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2>Matches</h2>
+    <a href="{% url 'match_create' club_pk=club.pk %}" class="btn btn-mfm-primary btn-sm">Schedule Match</a>
+</div>
 
 {% if club.matches.all %}
-<table border="1" cellpadding="5" style="margin-top: 10px;">
-    <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Opposition</th>
-        <th>H/A</th>
-        <th>Selected</th>
-        <th>Available</th>
-        <th>Maybe</th>
-        <th>Unavail</th>
-        <th>Awaiting</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
-    {% for match in club.matches.all %}
-    <tr>
-        <td>{{ match.date }}</td>
-        <td>{{ match.time|default:"TBC" }}</td>
-        <td>{{ match.opposition.name }}</td>
-        <td>{% if match.is_home %}H{% else %}A{% endif %}</td>
-        <td>{{ match.selected_count }}</td>
-        <td>{{ match.available_count }}</td>
-        <td>{{ match.maybe_count }}</td>
-        <td>{{ match.unavailable_count }}</td>
-        <td>{{ match.awaiting_count }}</td>
-        <td>{{ match.get_status_display }}</td>
-        <td>
-            <a href="{% url 'match_detail' pk=match.pk %}">View</a> |
-            <a href="{% url 'team_selection' match_pk=match.pk %}">Select</a> |
-            <a href="{% url 'bulk_availability' match_pk=match.pk %}">Availability</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<!-- Responsive table wrapper - allows horizontal scroll on mobile -->
+<div class="table-responsive">
+    <table class="table table-mfm table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Opposition</th>
+                <th>H/A</th>
+                <th>Selected</th>
+                <th>Available</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in club.matches.all %}
+            <tr>
+                <td>{{ match.date|date:"d M" }}</td>
+                <td>{{ match.opposition.name }}</td>
+                <td>{% if match.is_home %}H{% else %}A{% endif %}</td>
+                <td>{{ match.selected_count }}/11</td>
+                <td>{{ match.available_count }}</td>
+                <td>{{ match.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-    <p>No matches scheduled.</p>
+    <p class="text-muted">No matches scheduled.</p>
 {% endif %}
 {% endblock %}
-```
-
-Test it:
-```
-python manage.py runserver
-```
-```
-http://127.0.0.1:8000/club/1/
