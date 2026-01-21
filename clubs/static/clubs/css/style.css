@@ -51,7 +51,10 @@ body {
 .navbar-mfm {
     background-color: var(--mfm-deep-turf);
 }
-
+/* Override Bootstrap navbar toggler for dark navbar */
+.navbar-mfm {
+    --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 /* Fix faint navbar text - make links bright white */
 .navbar-mfm .nav-link {
     color: white !important;
@@ -77,7 +80,22 @@ body {
     height: 45px;
     width: auto;    
 }
+/* Mobile menu dropdown - brighter text */
+.navbar-mfm .navbar-nav .nav-link {
+    color: white !important;
+    opacity: 1 !important;
+    font-weight: 500;
+}
 
+.navbar-mfm .navbar-text {
+    color: white !important;
+    opacity: 1 !important;
+}
+
+/* Hamburger icon lines - more visible */
+.navbar-mfm .navbar-toggler-icon {
+    filter: brightness(2);
+}
 /* === Buttons === */
 .btn-mfm-primary {
     background-color: var(--mfm-deep-turf);
