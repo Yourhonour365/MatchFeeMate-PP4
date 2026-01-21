@@ -189,6 +189,12 @@ def match_create(request, club_pk):
         if form.is_valid():
             match = form.save(commit=False)
             match.club = club
+            # Auto-fill venue if empty
+            if not match.venue or not match.venue.strip():
+                if match.is_home:
+                    match.venue = club.home_ground
+                else:
+                    match.venue = match.opposition.home_ground
             match.save()
             return redirect('match_detail', pk=match.pk)
     else:
