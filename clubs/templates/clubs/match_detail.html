@@ -38,6 +38,7 @@
     <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
     <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a>
     <!-- Action links -->
+    <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a> |
     <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
     <a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
     <a href="{% url 'club_detail' pk=match.club.pk %}">Back to Club</a>

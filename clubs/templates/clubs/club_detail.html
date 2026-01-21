@@ -69,6 +69,7 @@
                 ({% if match.is_home %}H{% else %}A{% endif %})
                 - {{ match.get_status_display }}
                 - <a href="{% url 'match_detail' pk=match.pk %}">View</a>
+                - <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a>
                 - <a href="{% url 'match_update' pk=match.pk %}">Edit</a>
                 - <a href="{% url 'match_delete' pk=match.pk %}">Delete</a>
             </li>

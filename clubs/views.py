@@ -257,3 +257,32 @@ def set_availability(request, match_pk, availability):
         match_player.save()
     
     return redirect('match_detail', pk=match_pk)
+
+@login_required
+def team_selection(request, match_pk):
+    """Captain selects players for the match"""
+    match = get_object_or_404(Match, pk=match_pk)
+    # Permission check - only admin/captain can select team
+    if not match.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    
+    # Get all players and their availability for this match
+    players = Player.objects.filter(club=match.club, is_active=True)
+    
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('selected')
+        # Update all match_players for this match
+        for player in players:
+            match_player, created = MatchPlayer.objects.get_or_create(
+                match=match,
+                player=player,
+                defaults={'availability': 'maybe'}
+            )
+            match_player.selected = str(player.pk) in selected_ids
+            match_player.save()
+        return redirect('match_detail', pk=match_pk)
+    
+    return render(request, 'clubs/team_selection.html', {
+        'match': match,
+        'players': players
+    })

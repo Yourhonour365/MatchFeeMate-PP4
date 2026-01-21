@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Team - MatchFeeMate</title>
+</head>
+<body>
+    <h1>Select Team</h1>
+    <h2>{{ match.club.name }} vs {{ match.opposition.name }} - {{ match.date }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>Select</th>
+                <th>Player</th>
+                <th>Availability</th>
+            </tr>
+            {% for player in players %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="selected" value="{{ player.pk }}"
+                        {% for mp in match.match_players.all %}
+                            {% if mp.player.pk == player.pk and mp.selected %}checked{% endif %}
+                        {% endfor %}
+                    >
+                </td>
+                <td>{{ player.name }}</td>
+                <td>
+                    {% for mp in match.match_players.all %}
+                        {% if mp.player.pk == player.pk %}
+                            {{ mp.get_availability_display }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Save Selection</button>
+    </form>
+    
+    <a href="{% url 'match_detail' pk=match.pk %}">Cancel</a>
+</body>
+</html>
