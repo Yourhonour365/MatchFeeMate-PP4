@@ -63,10 +63,14 @@ class Opposition(models.Model):
 class Match(models.Model):
     """A scheduled cricket match"""
     
+    def available_count(self):
+        """Count players who are available"""
+        return self.match_players.filter(availability='yes').count()
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        
     ]
     
     club = models.ForeignKey(
