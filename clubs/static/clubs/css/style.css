@@ -158,3 +158,27 @@ a:hover {
     border-color: var(--mfm-error-light);
     color: var(--mfm-error-dark);
 }
+/* === Additional Button Styles === */
+.btn-mfm-brown {
+    background-color: #6D4C41;
+    border-color: #6D4C41;
+    color: white;
+}
+
+.btn-mfm-brown:hover {
+    background-color: #5D4037;
+    border-color: #5D4037;
+    color: white;
+}
+
+.btn-mfm-dark-blue {
+    background-color: #1565C0;
+    border-color: #1565C0;
+    color: white;
+}
+
+.btn-mfm-dark-blue:hover {
+    background-color: #0D47A1;
+    border-color: #0D47A1;
+    color: white;
+}

@@ -3,66 +3,106 @@
 {% block title %}{{ match.club.name }} vs {{ match.opposition.name }} - MatchFeeMate{% endblock %}
 
 {% block content %}
-<!-- Page heading -->
-<h1>{{ match.club.name }} vs {{ match.opposition.name }}</h1>
-
-<!-- Match details -->
-<p><strong>Date:</strong> {{ match.date }}</p>
-<p><strong>Time:</strong> {{ match.time|default:"TBC" }}</p>
-<p><strong>Venue:</strong> {{ match.venue|default:"TBC" }}</p>
-<p><strong>Home/Away:</strong> {% if match.is_home %}Home{% else %}Away{% endif %}</p>
-<p><strong>Match Fee:</strong> £{{ match.match_fee|default:"TBC" }}</p>
-<p><strong>Status:</strong> {{ match.get_status_display }}</p>
-<hr>
+<!-- Match details card - compact -->
+<div class="card card-mfm mb-3">
+    <div class="card-body py-2">
+        <h5 class="card-title mb-0">vs {{ match.opposition.name }} ({% if match.is_home %}H{% else %}A{% endif %})</h5>
+        <small class="text-muted fst-italic">{{ match.get_status_display }}</small>
+        <p class="small mb-1 mt-1"><strong>{{ match.date|date:"D d M Y" }}</strong> {{ match.time|default:"" }} · {{ match.venue|default:"TBC" }} · £{{ match.match_fee|default:"TBC" }}</p>
+        
+        <!-- Actions -->
+        <div class="d-flex gap-2 mt-2">
+            <a href="#availability" class="btn btn-mfm-primary btn-sm">View Availability</a>
+            <a href="{% url 'match_update' pk=match.pk %}" class="btn btn-mfm-secondary btn-sm">Edit Match</a>
+        </div>
+    </div>
+</div>
 
 <!-- Warning for unavailable selected players -->
 {% if unavailable_selected %}
-<p style="color: red;"><strong>Warning:</strong> These selected players are not available:</p>
-<ul>
-{% for mp in unavailable_selected %}
-    <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
-{% endfor %}
-</ul>
-<hr>
+<div class="alert alert-mfm-error mb-3 py-2">
+    <strong>Warning:</strong> Selected players not available:
+    {% for mp in unavailable_selected %}{{ mp.player.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+</div>
 {% endif %}
 
-<!-- Selected Team -->
-<h2>Selected Team ({{ selected_count }}/11)</h2>
-{% with selected=match.match_players.all %}
-    {% for mp in selected %}
-        {% if mp.selected %}
-            <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
+<!-- Selected Team card -->
+<div class="card card-mfm mb-3">
+    <div class="card-header py-1 bg-success text-white d-flex justify-content-between align-items-center">
+        <strong>Selected ({{ selected_count }}/11)</strong>
+        <a href="{% url 'team_selection' match_pk=match.pk %}" class="btn btn-light btn-sm py-0">Edit Selection</a>
+    </div>
+    <div class="card-body py-2">
+        {% with selected=match.match_players.all|dictsort:"player.name" %}
+            {% for mp in selected %}
+                {% if mp.selected %}
+                <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
+                    <span>{{ mp.player.name }}</span>
+                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                        {{ mp.get_availability_display }}
+                    </small>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endwith %}
+        {% if selected_count == 0 %}
+            <p class="text-muted mb-0 small">No team selected yet.</p>
         {% endif %}
-    {% empty %}
-    {% endfor %}
-{% endwith %}
+    </div>
+</div>
 
-{% if not match.match_players.all %}
-    <p>No team selected yet.</p>
-{% endif %}
+<!-- Available Players card - prominent for captain -->
+<div class="card card-mfm mb-3" id="availability">
+    <div class="card-header py-1 bg-primary text-white d-flex justify-content-between align-items-center">
+        <strong>Available ({{ available_count }})</strong>
+        <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-success btn-sm py-0">Edit Availability</a>
+    </div>
+    <div class="card-body py-2">
+        {% for mp in match.match_players.all|dictsort:"player.name" %}
+            {% if not mp.selected and mp.availability == 'yes' %}
+            <div class="py-1 {% if not forloop.last %}border-bottom{% endif %}">
+                {{ mp.player.name }}
+            </div>
+            {% endif %}
+        {% empty %}
+            <p class="text-muted mb-0 small">No players available.</p>
+        {% endfor %}
+    </div>
+</div>
 
-<hr>
+<!-- Maybe/Unavailable collapsed -->
+<div class="card card-mfm mb-3">
+    <div class="card-header py-1">
+        <strong>Maybe / Unavailable</strong>
+    </div>
+    <div class="card-body py-2">
+        {% for mp in match.match_players.all|dictsort:"player.name" %}
+            {% if not mp.selected and mp.availability != 'yes' %}
+            <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
+                <span>{{ mp.player.name }}</span>
+                <small class="{% if mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                    {{ mp.get_availability_display }}
+                </small>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 
-<!-- Squad Availability -->
-<h2>Available ({{ available_count }})</h2>
-{% for mp in match.match_players.all %}
-    {% if not mp.selected %}
-        <li>{{ mp.player.name }} - {{ mp.get_availability_display }}</li>
-    {% endif %}
-{% endfor %}
-<hr>
+<!-- Your Availability at bottom -->
+<div class="card card-mfm mb-3">
+    <div class="card-body py-2">
+        <strong class="small">Your Availability:</strong>
+        <div class="d-flex gap-2 mt-1">
+            <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill">Available</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-warning btn-sm flex-fill">Maybe</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill">Not Available</a>
+        </div>
+    </div>
+</div>
 
-<!-- Set your availability -->
-<h3>Your Availability</h3>
-<a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}">Available</a> |
-<a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
-<a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a>
-<hr>
-
-<!-- Action links -->
-<a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a> |
-<a href="{% url 'bulk_availability' match_pk=match.pk %}">Update Availability</a> |
-<a href="{% url 'match_update' pk=match.pk %}">Edit</a> |
-<a href="{% url 'match_delete' pk=match.pk %}">Delete</a> |
-<a href="{% url 'club_detail' pk=match.club.pk %}">Back to Club</a>
+<!-- Delete link at very bottom -->
+<div class="text-center">
+    <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-danger">Delete match</a></small>
+</div>
 {% endblock %}
