@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %} - MatchFeeMate{% endblock %}
+
+{% block content %}
+<h1>{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Bulk action bar -->
+    <div class="card card-mfm mb-3">
+        <div class="card-body py-2">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select All</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectNone()">Select None</button>
+                <span class="mx-2">Set selected to:</span>
+                <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
+                <button type="submit" name="availability" value="maybe" class="btn btn-warning btn-sm">Maybe</button>
+                <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Not Available</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Match list -->
+    {% if matches %}
+        {% for match in matches %}
+        <div class="card card-mfm mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input match-checkbox" type="checkbox" name="matches" value="{{ match.pk }}" id="match{{ match.pk }}">
+                        <label class="form-check-label" for="match{{ match.pk }}">
+                            <strong>{{ match.date|date:"D d M" }}</strong> vs {{ match.opposition.name }}
+                            {% if match.is_home %}<span class="badge bg-success ms-1">H</span>{% else %}<span class="badge bg-secondary ms-1">A</span>{% endif %}
+                        </label>
+                    </div>
+                    <span class="badge {% if match.my_availability == 'yes' %}bg-success{% elif match.my_availability == 'no' %}bg-danger{% elif match.my_availability == 'maybe' %}bg-warning text-dark{% else %}bg-light text-dark{% endif %}">
+                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Not Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No matches scheduled.</p>
+    {% endif %}
+</form>
+
+<script>
+function selectAll() {
+    document.querySelectorAll('.match-checkbox').forEach(cb => cb.checked = true);
+}
+function selectNone() {
+    document.querySelectorAll('.match-checkbox').forEach(cb => cb.checked = false);
+}
+</script>
+{% endblock %}

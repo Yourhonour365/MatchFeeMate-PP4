@@ -288,6 +288,10 @@ def set_availability(request, match_pk, availability):
         match_player.availability = availability
         match_player.save()
     
+    # Redirect back to where user came from, or match detail
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
     return redirect('match_detail', pk=match_pk)
 
 @login_required
@@ -397,6 +401,12 @@ def match_list(request):
         return redirect('home')
     
     matches = Match.objects.filter(club=player.club).order_by('date')
+    
+    # Get current user's availability for each match
+    for match in matches:
+        mp = MatchPlayer.objects.filter(match=match, player=player).first()
+        match.my_availability = mp.availability if mp else None
+    
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
         'matches': matches,
@@ -417,4 +427,80 @@ def player_list(request):
         'players': players,
         'club': player.club,
         'is_admin_or_captain': is_admin_or_captain,
+    })
+
+@login_required
+def my_availability(request):
+    """Player updates their own availability across all matches"""
+    player = Player.objects.filter(user=request.user).first()
+    if not player:
+        return redirect('home')
+    
+    matches = Match.objects.filter(club=player.club).order_by('date')
+    
+    # Get current availability for each match
+    for match in matches:
+        mp = MatchPlayer.objects.filter(match=match, player=player).first()
+        match.my_availability = mp.availability if mp else None
+    
+    if request.method == 'POST':
+        match_ids = request.POST.getlist('matches')
+        new_availability = request.POST.get('availability')
+        
+        for match_id in match_ids:
+            match = Match.objects.get(pk=match_id)
+            mp, created = MatchPlayer.objects.get_or_create(
+                match=match,
+                player=player,
+                defaults={'availability': new_availability}
+            )
+            if not created:
+                mp.availability = new_availability
+                mp.save()
+        
+        return redirect('my_availability')
+    
+    return render(request, 'clubs/my_availability.html', {
+        'matches': matches,
+        'player': player,
+    })
+
+
+@login_required
+def player_availability(request, player_pk):
+    """Admin/captain updates a player's availability across all matches"""
+    player = get_object_or_404(Player, pk=player_pk)
+    
+    # Permission check
+    if not player.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+    
+    matches = Match.objects.filter(club=player.club).order_by('date')
+    
+    # Get current availability for each match
+    for match in matches:
+        mp = MatchPlayer.objects.filter(match=match, player=player).first()
+        match.my_availability = mp.availability if mp else None
+    
+    if request.method == 'POST':
+        match_ids = request.POST.getlist('matches')
+        new_availability = request.POST.get('availability')
+        
+        for match_id in match_ids:
+            match = Match.objects.get(pk=match_id)
+            mp, created = MatchPlayer.objects.get_or_create(
+                match=match,
+                player=player,
+                defaults={'availability': new_availability}
+            )
+            if not created:
+                mp.availability = new_availability
+                mp.save()
+        
+        return redirect('player_availability', player_pk=player_pk)
+    
+    return render(request, 'clubs/my_availability.html', {
+        'matches': matches,
+        'player': player,
+        'is_admin_view': True,
     })

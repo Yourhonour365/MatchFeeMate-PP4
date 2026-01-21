@@ -31,6 +31,22 @@
                 <span>Available: {{ match.available_count }}</span>
                 <span>{{ match.get_status_display }}</span>
             </div>
+            
+            <!-- My availability -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="small">
+                    <strong>My status:</strong>
+                    <span class="badge {% if match.my_availability == 'yes' %}bg-success{% elif match.my_availability == 'no' %}bg-danger{% elif match.my_availability == 'maybe' %}bg-warning text-dark{% else %}bg-light text-dark{% endif %}">
+                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Not Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
+                    </span>
+                </span>
+                <div class="btn-group btn-group-sm">
+                    <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}?next={% url 'match_list' %}" class="btn btn-outline-success btn-sm {% if match.my_availability == 'yes' %}active{% endif %}">✓</a>
+                    <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}?next={% url 'match_list' %}" class="btn btn-outline-warning btn-sm {% if match.my_availability == 'maybe' %}active{% endif %}">?</a>
+                    <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}?next={% url 'match_list' %}" class="btn btn-outline-danger btn-sm {% if match.my_availability == 'no' %}active{% endif %}">✗</a>
+                </div>
+            </div>
+            
             <!-- Action button -->
             <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm w-100">View Match</a>
         </div>
@@ -40,8 +56,3 @@
     <p class="text-muted">No matches scheduled.</p>
 {% endif %}
 {% endblock %}
-```
-
-Now show me `player_list.html`:
-```
-type clubs\templates\clubs\player_list.html
