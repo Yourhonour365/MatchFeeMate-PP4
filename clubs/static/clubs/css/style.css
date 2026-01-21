@@ -43,7 +43,7 @@
 
 /* === Page Background === */
 body {
-    background-color: var(--mfm-cream-white);
+    background-color: var(--mfm-cream);
     color: var(--mfm-text-primary);
 }
 
