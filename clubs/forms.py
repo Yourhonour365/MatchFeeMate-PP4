@@ -21,10 +21,27 @@ class OppositionForm(forms.ModelForm):
 
 class MatchForm(forms.ModelForm):
     """Form for creating and editing matches"""
+    
+    HOME_AWAY_CHOICES = [
+        (True, 'Home'),
+        (False, 'Away'),
+    ]
+    
+    is_home = forms.ChoiceField(
+        choices=HOME_AWAY_CHOICES,
+        widget=forms.RadioSelect,
+        initial=True,
+        label='Home or Away'
+    )
+    
     class Meta:
         model = Match
-        fields = ['opposition', 'date', 'time', 'venue', 'is_home', 'match_fee', 'status']
+        fields = ['opposition', 'date', 'time', 'is_home', 'venue', 'match_fee', 'status']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'}),
-        }     
+        }
+    
+    def clean_is_home(self):
+        """Convert string to boolean"""
+        return self.cleaned_data['is_home'] == 'True'

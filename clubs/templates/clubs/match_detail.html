@@ -36,7 +36,8 @@
     <h3>Your Availability</h3>
     <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}">Available</a> |
     <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}">Not Available</a> |
-    <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a>
+    <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}">Maybe</a> |
+    <hr>
     <!-- Action links -->
     <a href="{% url 'team_selection' match_pk=match.pk %}">Select Team</a> |
     <a href="{% url 'match_update' pk=match.pk %}">Edit</a> |

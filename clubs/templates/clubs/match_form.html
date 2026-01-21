@@ -13,5 +13,51 @@
     </form>
     
     <a href="{% url 'club_detail' pk=club.pk %}">Cancel</a>
+    
+    <script>
+        // Get form elements
+        const isHomeRadios = document.querySelectorAll('input[name="is_home"]');
+        const oppositionSelect = document.querySelector('select[name="opposition"]');
+        const venueInput = document.querySelector('input[name="venue"]');
+        const homeGround = "{{ club.home_ground|escapejs }}";
+        
+        // Opposition home grounds
+        const oppGrounds = {
+            {% for opp in club.oppositions.all %}
+            "{{ opp.pk }}": "{{ opp.home_ground|escapejs }}",
+            {% endfor %}
+        };
+        
+        function isHome() {
+            const checked = document.querySelector('input[name="is_home"]:checked');
+            return checked && checked.value === 'True';
+        }
+        
+        function updateVenue() {
+            if (venueInput.value.trim() === '') {
+                if (isHome()) {
+                    venueInput.value = homeGround;
+                } else if (oppositionSelect.value) {
+                    venueInput.value = oppGrounds[oppositionSelect.value] || '';
+                }
+            }
+        }
+        
+        isHomeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                venueInput.value = '';
+                updateVenue();
+            });
+        });
+        
+        oppositionSelect.addEventListener('change', function() {
+            if (!isHome()) {
+                venueInput.value = '';
+                updateVenue();
+            }
+        });
+        // Auto-fill on page load
+        updateVenue();
+    </script>
 </body>
 </html>
