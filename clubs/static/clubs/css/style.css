@@ -190,15 +190,28 @@ a:hover {
 }
 
 .btn-mfm-dark-blue {
-    background-color: #1565C0;
-    border-color: #1565C0;
+    background-color: #0D47A1;
+    border-color: #0D47A1;
     color: white;
 }
 
 .btn-mfm-dark-blue:hover {
-    background-color: #0D47A1;
-    border-color: #0D47A1;
+    background-color: #0A3A8A;
+    border-color: #0A3A8A;
     color: white;
+}
+
+.btn-mfm-light-blue {
+    background-color: #1976D2;
+    border-color: #1976D2;
+    color: white;
+}
+
+.btn-mfm-light-blue:hover {
+    background-color: #1565C0;
+    border-color: #1565C0;
+    color: white;
+}
 }
 /* === Card Header Styles === */
 .card-header-selected {
@@ -225,3 +238,4 @@ a:hover {
 .text-unavailable {
     color: #C62828;
 }
+

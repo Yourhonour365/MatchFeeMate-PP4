@@ -402,10 +402,12 @@ def match_list(request):
     
     matches = Match.objects.filter(club=player.club).order_by('date')
     
-    # Get current user's availability for each match
+    # Get current user's availability and selection status for each match
     for match in matches:
         mp = MatchPlayer.objects.filter(match=match, player=player).first()
         match.my_availability = mp.availability if mp else None
+        match.is_selected = mp.selected if mp else False
+        match.maybe_count = match.match_players.filter(availability='maybe').count()
     
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
