@@ -11,7 +11,7 @@ def home(request):
         # Check if user has a club (as a player)
         player = Player.objects.filter(user=request.user).first()
         if player:
-            return redirect('club_detail', pk=player.club.pk)
+            return redirect('match_list')
     return render(request, 'clubs/home.html')
 
 @login_required
