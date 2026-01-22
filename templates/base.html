@@ -33,7 +33,7 @@
                     <a class="nav-link" href="{% url 'match_list' %}">Matches</a>
                     <a class="nav-link" href="{% url 'my_availability' %}">My Availability</a>
                     <a class="nav-link" href="{% url 'player_list' %}">Players</a>
-                    <a class="nav-link" href="{% url 'home' %}">Club</a>
+                    {% if current_player and current_player.club %}<a class="nav-link" href="{% url 'club_detail' pk=current_player.club.pk %}">Club</a>{% endif %}
                 </div>
                 {% endif %}
                 

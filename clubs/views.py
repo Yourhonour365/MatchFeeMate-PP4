@@ -29,7 +29,7 @@ def club_create(request):
             Player.objects.create(
                 club=club,
                 user=request.user,
-                name=request.user.email,
+                name=request.user.email.split('@')[0].title(),
                 email=request.user.email,
                 role='admin'
             )
