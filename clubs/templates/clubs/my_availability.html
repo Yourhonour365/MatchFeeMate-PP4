@@ -33,6 +33,7 @@
                         <label class="form-check-label" for="match{{ match.pk }}">
                             <strong>{{ match.date|date:"D d M" }}</strong> vs {{ match.opposition.name }}
                             <small class="text-muted">({% if match.is_home %}Home{% else %}Away{% endif %})</small>
+                            {% if match.is_selected %}<span class="badge bg-success ms-1">In team</span>{% endif %}
                         </label>
                     </div>
                     <small class="{% if match.my_availability == 'yes' %}text-success fw-bold{% elif match.my_availability == 'no' %}text-danger fw-bold{% elif match.my_availability == 'maybe' %}text-warning fw-bold{% else %}text-muted{% endif %}">

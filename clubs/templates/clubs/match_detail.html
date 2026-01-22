@@ -42,10 +42,16 @@
             {% for mp in selected %}
                 {% if mp.selected %}
                 <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
-                    <span>{{ mp.player.name }}</span>
-                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-unavailable{% else %}text-maybe{% endif %}">
-                        {{ mp.get_availability_display }}
+                    <span class="{% if mp.player == current_player %}fw-bold fst-italic{% endif %}">{{ mp.player.name }}</span>
+                    {% if is_admin_or_captain %}
+                    <a href="{% url 'player_availability' player_pk=mp.player.pk %}" class="small text-decoration-underline {% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                        {% if mp.availability == 'yes' %}Available{% elif mp.availability == 'no' %}Unavailable{% else %}Maybe{% endif %}
+                    </a>
+                    {% else %}
+                    <small class="{% if mp.availability == 'yes' %}text-success{% elif mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                        {% if mp.availability == 'yes' %}Available{% elif mp.availability == 'no' %}Unavailable{% else %}Maybe{% endif %}
                     </small>
+                    {% endif %}
                 </div>
                 {% endif %}
             {% endfor %}
@@ -56,19 +62,19 @@
     </div>
 </div>
 
-<!-- Available Players card -->
+{% if is_admin_or_captain %}
+<!-- Available Players card - admin only -->
 <div class="card card-mfm mb-3" id="availability">
     <div class="card-header py-1 card-header-available d-flex justify-content-between align-items-center">
         <strong>Available ({{ available_count }})</strong>
-        {% if is_admin_or_captain %}
         <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-mfm-dark-blue btn-sm py-0">Edit Availability</a>
-        {% endif %}
     </div>
     <div class="card-body py-2">
         {% for mp in match.match_players.all|dictsort:"player.name" %}
             {% if not mp.selected and mp.availability == 'yes' %}
-            <div class="py-1 {% if not forloop.last %}border-bottom{% endif %}">
-                {{ mp.player.name }}
+            <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
+                <span>{{ mp.player.name }}</span>
+                <a href="{% url 'player_availability' player_pk=mp.player.pk %}" class="small text-decoration-underline text-success">Available</a>
             </div>
             {% endif %}
         {% empty %}
@@ -77,7 +83,7 @@
     </div>
 </div>
 
-<!-- Maybe/Unavailable collapsed -->
+<!-- Maybe/Unavailable - admin only -->
 <div class="card card-mfm mb-3">
     <div class="card-header py-1 card-header-maybe">
         <strong>Maybe / Unavailable</strong>
@@ -87,15 +93,16 @@
             {% if not mp.selected and mp.availability != 'yes' %}
             <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
                 <span>{{ mp.player.name }}</span>
-                <small class="{% if mp.availability == 'no' %}text-unavailable{% else %}text-maybe{% endif %}">
-                    {{ mp.get_availability_display }}
-                </small>
+                <a href="{% url 'player_availability' player_pk=mp.player.pk %}" class="small text-decoration-underline {% if mp.availability == 'no' %}text-danger{% else %}text-warning{% endif %}">
+                    {% if mp.availability == 'no' %}Unavailable{% else %}Maybe{% endif %}
+                </a>
             </div>
             {% endif %}
         {% endfor %}
     </div>
 </div>
-<!-- Not Responded -->
+
+<!-- Not Responded - admin only -->
 {% if not_responded %}
 <div class="card card-mfm mb-3">
     <div class="card-header py-1 bg-light">
@@ -103,13 +110,16 @@
     </div>
     <div class="card-body py-2">
         {% for player in not_responded %}
-        <div class="py-1 {% if not forloop.last %}border-bottom{% endif %}">
-            {{ player.name }}
+        <div class="d-flex justify-content-between align-items-center py-1 {% if not forloop.last %}border-bottom{% endif %}">
+            <span>{{ player.name }}</span>
+            <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-muted">Not Set</a>
         </div>
         {% endfor %}
     </div>
 </div>
 {% endif %}
+{% endif %}
+
 <!-- Your Availability at bottom - all players can see -->
 <div class="card card-mfm mb-3">
     <div class="card-body py-2">
@@ -117,7 +127,7 @@
         <div class="d-flex gap-2 mt-1">
             <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill d-flex align-items-center justify-content-center">Available</a>
             <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-warning btn-sm flex-fill d-flex align-items-center justify-content-center">Maybe</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill d-flex align-items-center justify-content-center">Not Available</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill d-flex align-items-center justify-content-center">Unavailable</a>
         </div>
     </div>
 </div>
@@ -125,7 +135,7 @@
 <!-- Delete link - admin/captain only -->
 {% if is_admin_or_captain %}
 <div class="text-center">
-    <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-unavailable">Delete match</a></small>
+    <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-danger">Delete match</a></small>
 </div>
 {% endif %}
 {% endblock %}

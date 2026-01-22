@@ -48,9 +48,11 @@
 
             <!-- Row 5: Buttons -->
             <div class="d-flex gap-1 mt-2">
-                <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm">Selection</a>
                 {% if is_admin_or_captain %}
+                <a href="{% url 'team_selection' match_pk=match.pk %}" class="btn btn-mfm-primary btn-sm">Selection</a>
                 <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="btn btn-mfm-dark-blue btn-sm">Availability</a>
+                {% else %}
+                <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-mfm-primary btn-sm">View Team</a>
                 {% endif %}
                 <a href="{% url 'my_availability' %}" class="btn btn-mfm-light-blue btn-sm">My Availability</a>
                 {% if is_admin_or_captain %}

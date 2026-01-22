@@ -223,7 +223,8 @@ def match_detail(request, pk):
     
     # Permission check
     is_admin_or_captain = match.club.is_admin_or_captain(request.user)
-    
+    current_player = Player.objects.filter(user=request.user).first()
+
     # Players who haven't responded yet
     responded_player_ids = match_players.values_list('player_id', flat=True)
     not_responded = Player.objects.filter(club=match.club, is_active=True).exclude(id__in=responded_player_ids)
@@ -302,6 +303,9 @@ def team_selection(request, match_pk):
     if not match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
     
+    # Get current user's player record
+    current_player = Player.objects.filter(user=request.user).first()
+    
     # Get all players and their availability for this match
     players = Player.objects.filter(club=match.club, is_active=True)
     
@@ -315,6 +319,7 @@ def team_selection(request, match_pk):
         mp = match.match_players.filter(player=player).first()
         player.is_selected = mp.selected if mp else False
         player.availability = mp.availability if mp else 'maybe'
+        player.is_current_user = (player == current_player)
         
         if player.is_selected:
             selected_players.append(player)
@@ -324,6 +329,9 @@ def team_selection(request, match_pk):
             maybe_players.append(player)
         else:
             unavailable_players.append(player)
+    
+    # Warning: selected but not available
+    unavailable_selected = [p for p in selected_players if p.availability != 'yes']
     
     if request.method == 'POST':
         selected_ids = request.POST.getlist('selected')
@@ -336,7 +344,7 @@ def team_selection(request, match_pk):
             )
             match_player.selected = str(player.pk) in selected_ids
             match_player.save()
-        return redirect('match_detail', pk=match_pk)
+        return redirect('team_selection', match_pk=match_pk)
     
     return render(request, 'clubs/team_selection.html', {
         'match': match,
@@ -344,6 +352,7 @@ def team_selection(request, match_pk):
         'available_players': available_players,
         'maybe_players': maybe_players,
         'unavailable_players': unavailable_players,
+        'unavailable_selected': unavailable_selected,
     })
 
 @login_required
@@ -444,7 +453,8 @@ def my_availability(request):
     for match in matches:
         mp = MatchPlayer.objects.filter(match=match, player=player).first()
         match.my_availability = mp.availability if mp else None
-    
+        match.is_selected = mp.selected if mp else False  
+
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
         new_availability = request.POST.get('availability')
