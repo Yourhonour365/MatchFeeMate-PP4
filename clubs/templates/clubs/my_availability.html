@@ -16,8 +16,8 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectNone()">Select None</button>
                 <span class="mx-2">Set selected to:</span>
                 <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
-                <button type="submit" name="availability" value="maybe" class="btn btn-warning btn-sm">Maybe</button>
-                <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Not Available</button>
+                <button type="submit" name="availability" value="maybe" class="btn btn-mfm-warning btn-sm">Maybe</button>
+                <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Unavailable</button>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
                         </label>
                     </div>
                     <small class="{% if match.my_availability == 'yes' %}text-success fw-bold{% elif match.my_availability == 'no' %}text-danger fw-bold{% elif match.my_availability == 'maybe' %}text-warning fw-bold{% else %}text-muted{% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Not Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
+                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Unavailable{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
                     </small>
                 </div>
             </div>

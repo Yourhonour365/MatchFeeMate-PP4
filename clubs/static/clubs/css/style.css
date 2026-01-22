@@ -212,7 +212,19 @@ a:hover {
     border-color: #1565C0;
     color: white;
 }
+
+.btn-mfm-warning {
+    background-color: #E65100;
+    border-color: #E65100;
+    color: white;
 }
+
+.btn-mfm-warning:hover {
+    background-color: #BF360C;
+    border-color: #BF360C;
+    color: white;
+}
+
 /* === Card Header Styles === */
 .card-header-selected {
     background-color: var(--mfm-turf-light);
@@ -239,3 +251,7 @@ a:hover {
     color: #C62828;
 }
 
+/* Override Bootstrap warning text - darker amber */
+.text-warning {
+    color: #E65100 !important;
+}
