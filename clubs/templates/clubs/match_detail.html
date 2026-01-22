@@ -126,7 +126,7 @@
         <strong class="small">Your Availability:</strong>
         <div class="d-flex gap-2 mt-1">
             <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill d-flex align-items-center justify-content-center">Available</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-warning btn-sm flex-fill d-flex align-items-center justify-content-center">Maybe</a>
+            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-mfm-warning btn-sm flex-fill d-flex align-items-center justify-content-center">Maybe</a>
             <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill d-flex align-items-center justify-content-center">Unavailable</a>
         </div>
     </div>
