@@ -6,10 +6,32 @@
 <!-- Page heading -->
 <h1 class="mb-3">{% if club %}Edit Club{% else %}Create New Club{% endif %}</h1>
 
-<div class="card card-mfm mb-3">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
+<form method="post">
+    {% csrf_token %}
+    
+    {% if not club %}
+    <!-- Your details section - only show when creating -->
+    <div class="card card-mfm mb-3" style="background-color: #E5DFD3;">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Your details</h5>
+            
+            <div class="mb-3">
+                <label class="form-label" for="admin_name"><strong>Your name</strong></label>
+                <input type="text" class="form-control" id="admin_name" name="admin_name" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" for="admin_phone"><strong>Phone</strong> <span class="text-muted">(optional)</span></label>
+                <input type="tel" class="form-control" id="admin_phone" name="admin_phone">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Club details section -->
+    <div class="card card-mfm mb-3" style="background-color: #D7CCC8;">
+        <div class="card-body">
+            {% if not club %}<h5 class="card-title mb-3">Club details</h5>{% endif %}
             
             {% for field in form %}
             <div class="mb-3">
@@ -23,18 +45,17 @@
                 {% endif %}
             </div>
             {% endfor %}
-            
-            <!-- Action buttons -->
-            <div class="d-flex gap-2 mt-3">
-                <button type="submit" class="btn btn-mfm-primary flex-fill">Save</button>
-                <a href="{% if club %}{% url 'club_detail' pk=club.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+    
+    <!-- Action buttons -->
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-mfm-primary flex-fill">{% if club %}Save{% else %}Create Club{% endif %}</button>
+        <a href="{% if club %}{% url 'club_detail' pk=club.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
 
 <script>
-    // Add Bootstrap form-control class to all inputs
     document.querySelectorAll('input, select, textarea').forEach(el => {
         if (el.type === 'checkbox' || el.type === 'radio') {
             el.classList.add('form-check-input');

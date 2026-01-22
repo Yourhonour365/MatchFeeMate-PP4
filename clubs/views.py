@@ -29,8 +29,9 @@ def club_create(request):
             Player.objects.create(
                 club=club,
                 user=request.user,
-                name=request.user.email.split('@')[0].title(),
+                name=request.POST.get('admin_name'),
                 email=request.user.email,
+                phone=request.POST.get('admin_phone', ''),
                 role='admin'
             )
             return redirect('club_detail', pk=club.pk)
