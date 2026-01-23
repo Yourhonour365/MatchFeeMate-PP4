@@ -51,11 +51,15 @@
                 </div>
                 <div>
                     {% if is_admin_or_captain %}
+                    <span class="text-muted">·</span>
                     <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Selection</a>
                     <span class="text-muted">·</span>
-                    <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="text-decoration-underline text-success" style="color: #0A230C;">Availability</a>
+                    <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="text-decoration-underline text-success">Availability</a>
+                    <span class="text-muted">·</span>
                     {% else %}
+                    <span class="text-muted">·</span>
                     <a href="{% url 'match_detail' pk=match.pk %}" class="text-decoration-underline text-primary">View Team</a>
+                    <span class="text-muted">·</span>
                     {% endif %}
                 </div>
             </div>
