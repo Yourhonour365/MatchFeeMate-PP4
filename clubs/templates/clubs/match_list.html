@@ -33,32 +33,32 @@
                 Selected: <strong>{{ match.selected_count }}/11</strong> · Available: {{ match.available_count }} · Maybe: {{ match.maybe_count }}
             </div>
             
-            <!-- Row 4: My Status (linked) -->
-            <div class="small mt-1">
-                <a href="{% url 'my_availability' %}" class="text-decoration-underline">My status</a>: 
-                {% if match.is_selected %}
-                    <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">Selected</span>,
-                    <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
-                    </span>
-                {% else %}
-                    <span>----</span>,
-                    <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
-                    </span>
-                {% endif %}
+            <!-- Row 4: My Status + Links -->
+            <div class="d-flex align-items-center small mt-1 gap-3">
+                <div>
+                    <a href="{% url 'my_availability' %}" class="text-decoration-underline text-secondary">My status</a>:
+                    {% if match.is_selected %}
+                        <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">Selected</span>,
+                        <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
+                            {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
+                        </span>
+                    {% else %}
+                        <span>----</span>,
+                        <span class="fw-bold {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
+                            {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if is_admin_or_captain %}
+                    <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Selection</a>
+                    <span class="text-muted">·</span>
+                    <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="text-decoration-underline text-success" style="color: #0A230C;">Availability</a>
+                    {% else %}
+                    <a href="{% url 'match_detail' pk=match.pk %}" class="text-decoration-underline text-primary">View Team</a>
+                    {% endif %}
+                </div>
             </div>
-
-            <!-- Row 5: Links -->
-            <div class="d-flex gap-3 mt-2 small">
-                {% if is_admin_or_captain %}
-                <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline">Selection</a>
-                <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="text-decoration-underline">Availability</a>
-                {% else %}
-                <a href="{% url 'match_detail' pk=match.pk %}" class="text-decoration-underline">View Team</a>
-                {% endif %}
-            </div>
-        </div>
     </div>
     {% endfor %}
 {% else %}
