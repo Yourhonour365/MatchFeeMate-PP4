@@ -3,103 +3,125 @@
 {% block title %}Select Team - MatchFeeMate{% endblock %}
 
 {% block content %}
-<!-- Match header - compact -->
+<!-- Match header - consistent with match list -->
 <div class="card card-mfm mb-3">
-    <div class="card-body py-2">
-        <h5 class="card-title mb-0">vs {{ match.opposition.name }} ({% if match.is_home %}H{% else %}A{% endif %})</h5>
-        <p class="small mb-0 mt-1">{{ match.date|date:"D d M Y" }} · {{ match.venue|default:"TBC" }}</p>
+    <div class="card-body p-2">
+        <div class="lh-1">
+            <strong>{{ match.date|date:"D d M" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
+        </div>
+        <div class="small mt-1">
+            {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Selected: <span class="{% if selected_players|length >= 11 %}text-success{% else %}text-warning{% endif %}">{{ selected_players|length }}/11</span>{% if selected_players|length >= 11 %} <em class="text-success">Full</em>{% endif %}
+        </div>
     </div>
 </div>
 
 <form method="post">
     {% csrf_token %}
     
-    <!-- Currently selected players -->
-    <div class="card card-mfm mb-3">
-        <div class="card-header py-1 card-header-selected">
-            <strong>Selected ({{ selected_players|length }}/11)</strong>
-        </div>
-        <div class="card-body py-2">
-            {% for player in selected_players %}
-            <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                <div>
-                    <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
-                    <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">{{ player.name }}</label>
+    <div class="accordion" id="selectionAccordion">
+        <!-- Currently selected players -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button card-header-selected py-2" type="button" data-bs-toggle="collapse" data-bs-target="#selectedPlayers" aria-expanded="true">
+                    <strong>Selected ({{ selected_players|length }})</strong>{% if selected_players|length >= 11 %}&nbsp;<em class="text-success">Full</em>{% endif %}
+                </button>
+            </h2>
+            <div id="selectedPlayers" class="accordion-collapse collapse show" data-bs-parent="#selectionAccordion">
+                <div class="accordion-body py-2">
+                    {% for player in selected_players %}
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
+                        <div>
+                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">{{ player.name }}</label>
+                        </div>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline {% if player.availability == 'yes' %}text-success{% elif player.availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">
+                            {% if player.availability == 'yes' %}Available{% elif player.availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0 small">No players selected yet.</p>
+                    {% endfor %}
                 </div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline {% if player.availability == 'yes' %}text-success{% elif player.availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">
-                    {% if player.availability == 'yes' %}Available{% elif player.availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
-                </a>
             </div>
-            {% empty %}
-            <p class="text-muted mb-0 small">No players selected yet.</p>
-            {% endfor %}
+        </div>
+        
+        <!-- Available players -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed card-header-available py-2" type="button" data-bs-toggle="collapse" data-bs-target="#availablePlayers" aria-expanded="false">
+                    <strong>Available ({{ available_players|length }})</strong>
+                </button>
+            </h2>
+            <div id="availablePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+                <div class="accordion-body py-2">
+                    {% for player in available_players %}
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
+                        <div>
+                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">{{ player.name }}</label>
+                        </div>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-success">Available</a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0 small">No players available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Maybe players -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed card-header-maybe py-2" type="button" data-bs-toggle="collapse" data-bs-target="#maybePlayers" aria-expanded="false">
+                    <strong>Maybe ({{ maybe_players|length }})</strong>
+                </button>
+            </h2>
+            <div id="maybePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+                <div class="accordion-body py-2">
+                    {% for player in maybe_players %}
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
+                        <div>
+                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">{{ player.name }}</label>
+                        </div>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-warning">Maybe</a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0 small">No players with maybe status.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unavailable players -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed bg-danger-subtle text-dark py-2" type="button" data-bs-toggle="collapse" data-bs-target="#unavailablePlayers" aria-expanded="false">
+                    <strong>Not Available ({{ unavailable_players|length }})</strong>
+                </button>
+            </h2>
+            <div id="unavailablePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+                <div class="accordion-body py-2">
+                    {% for player in unavailable_players %}
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
+                        <div>
+                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">{{ player.name }}</label>
+                        </div>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-danger">Unavailable</a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0 small">No players unavailable.</p>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Available players -->
-    <div class="card card-mfm mb-3">
-        <div class="card-header py-1 card-header-available">
-            <strong>Available ({{ available_players|length }})</strong>
-        </div>
-        <div class="card-body py-2">
-            {% for player in available_players %}
-            <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                <div>
-                    <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
-                    <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">{{ player.name }}</label>
-                </div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-success">Available</a>
-            </div>
-            {% empty %}
-            <p class="text-muted mb-0 small">No players available.</p>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <!-- Maybe players -->
-    <div class="card card-mfm mb-3">
-        <div class="card-header py-1 card-header-maybe">
-            <strong>Maybe ({{ maybe_players|length }})</strong>
-        </div>
-        <div class="card-body py-2">
-            {% for player in maybe_players %}
-            <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                <div>
-                    <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
-                    <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">{{ player.name }}</label>
-                </div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-warning">Maybe</a>
-            </div>
-            {% empty %}
-            <p class="text-muted mb-0 small">No players with maybe status.</p>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <!-- Unavailable players -->
-    <div class="card card-mfm mb-3">
-        <div class="card-header py-1 bg-danger text-white">
-            <strong>Not Available ({{ unavailable_players|length }})</strong>
-        </div>
-        <div class="card-body py-2">
-            {% for player in unavailable_players %}
-            <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                <div>
-                    <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
-                    <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">{{ player.name }}</label>
-                </div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-danger">Unavailable</a>
-            </div>
-            {% empty %}
-            <p class="text-muted mb-0 small">No players unavailable.</p>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <!-- Action buttons -->
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-mfm-primary flex-fill">Save Selection</button>
-        <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        
+    <!-- Action buttons - sticky at bottom -->
+    <div class="position-sticky bottom-0 py-2 d-flex justify-content-center gap-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+        <a href="{% url 'match_detail' pk=match.pk %}" class="btn btn-outline-secondary px-5">Back</a>
+        <button type="submit" class="btn btn-mfm-primary px-5">Save</button>
     </div>
 </form>
 {% endblock %}
