@@ -3,6 +3,7 @@
 {% block title %}Update Availability - MatchFeeMate{% endblock %}
 
 {% block content %}
+<h1 class="h5 mb-3 text-success">Availability</h1>
 <!-- Match header - consistent with match list -->
 <div class="card card-mfm mb-3">
     <div class="card-body p-2">
@@ -140,22 +141,17 @@
         </div>
     </div>
     
-    <!-- Availability selector -->
-    <div class="card card-mfm my-3">
-        <div class="card-body py-2">
-            <label class="form-label"><strong>Set Availability To:</strong></label>
-            <select name="availability" class="form-select" required>
-                <option value="yes">Available</option>
-                <option value="no">Unavailable</option>
-                <option value="maybe">Maybe</option>
-            </select>
+    <!-- Sticky bottom: buttons -->
+    <div class="position-sticky bottom-0 pt-2 pb-3" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+        <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+            <span><strong>Set to:</strong></span>
+            <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
+            <button type="submit" name="availability" value="maybe" class="btn btn-mfm-warning btn-sm">Maybe</button>
+            <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Unavailable</button>
         </div>
-    </div>
-    
-    <!-- Action buttons - sticky at bottom -->
-    <div class="position-sticky bottom-0 py-2 d-flex justify-content-center gap-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
-        <a href="{% url 'match_list' %}" class="btn btn-outline-secondary px-5">Back</a>
-        <button type="submit" class="btn btn-mfm-dark-blue px-5">Save</button>
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+        </div>
     </div>
 </form>
 {% endblock %}
