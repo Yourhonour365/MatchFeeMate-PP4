@@ -13,7 +13,7 @@
 
 {% if matches %}
     {% for match in matches %}
-    <div class="card card-mfm mb-3">
+    <div class="card card-mfm mb-3{% if match.status == 'cancelled' %} opacity-50{% endif %}">
         <div class="card-body p-2">
             <!-- Row 1: Date, H/A, Opposition -->
             <div class="lh-1">

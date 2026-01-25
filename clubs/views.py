@@ -405,7 +405,8 @@ def bulk_availability(request, match_pk):
                 match_player.availability = new_availability
                 match_player.save()
         
-        return redirect('match_detail', pk=match_pk)
+        messages.success(request, 'Availability updated successfully.')
+        return redirect('bulk_availability', match_pk=match_pk)
     
     return render(request, 'clubs/bulk_availability.html', {
         'match': match,
@@ -463,11 +464,12 @@ def my_availability(request):
     
     matches = Match.objects.filter(club=player.club).order_by('date')
     
-    # Get current availability for each match
+    # Get current availability and selected count for each match
     for match in matches:
         mp = MatchPlayer.objects.filter(match=match, player=player).first()
         match.my_availability = mp.availability if mp else None
-        match.is_selected = mp.selected if mp else False  
+        match.is_selected = mp.selected if mp else False
+        match.selected_count = MatchPlayer.objects.filter(match=match, selected=True).count()
 
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
@@ -484,13 +486,13 @@ def my_availability(request):
                 mp.availability = new_availability
                 mp.save()
         
+        messages.success(request, 'Availability updated successfully.')
         return redirect('my_availability')
     
     return render(request, 'clubs/my_availability.html', {
         'matches': matches,
         'player': player,
     })
-
 
 @login_required
 def player_availability(request, player_pk):
