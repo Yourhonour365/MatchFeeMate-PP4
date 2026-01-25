@@ -12,6 +12,9 @@ class PlayerForm(forms.ModelForm):
     class Meta:
         model = Player
         fields = ['name', 'email', 'phone']
+        widgets = {
+            'phone': forms.TextInput(attrs={'type': 'tel'}),
+        }
 
 class OppositionForm(forms.ModelForm):
     """Form for creating and editing opposition teams"""
