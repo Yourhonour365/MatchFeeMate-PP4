@@ -3,43 +3,42 @@
 {% block title %}{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %} - MatchFeeMate{% endblock %}
 
 {% block content %}
-<h1>{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %}</h1>
+<h1 class="h5 mb-3 text-success">{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %}</h1>
 
 <form method="post">
     {% csrf_token %}
-    
-    <!-- Bulk action bar -->
-    <div class="card card-mfm mb-3">
-        <div class="card-body py-2">
-            <div class="d-flex flex-wrap gap-2 align-items-center">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select All</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectNone()">Select None</button>
-                <span class="mx-2">Set selected to:</span>
-                <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
-                <button type="submit" name="availability" value="maybe" class="btn btn-mfm-warning btn-sm">Maybe</button>
-                <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Unavailable</button>
-            </div>
-        </div>
-    </div>
     
     <!-- Match list -->
     {% if matches %}
         {% for match in matches %}
         <div class="card card-mfm mb-2">
-            <div class="card-body py-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="form-check">
-                        <input class="form-check-input match-checkbox" type="checkbox" name="matches" value="{{ match.pk }}" id="match{{ match.pk }}">
-                        <label class="form-check-label" for="match{{ match.pk }}">
-                            <strong>{{ match.date|date:"D d M" }}</strong> vs {{ match.opposition.name }}
-                            <small class="text-muted">({% if match.is_home %}Home{% else %}Away{% endif %})</small>
-                            {% if match.is_selected %}<span class="badge bg-success ms-1">In team</span>{% endif %}
-                            <a href="{% url 'match_detail' pk=match.pk %}" class="fst-italic ms-2 small">view team</a>
-                        </label>
-                    </div>
-                    <small class="{% if match.my_availability == 'yes' %}text-success fw-bold{% elif match.my_availability == 'no' %}text-danger fw-bold{% elif match.my_availability == 'maybe' %}text-warning fw-bold{% else %}text-muted{% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'no' %}Unavailable{% elif match.my_availability == 'maybe' %}Maybe{% else %}Not Set{% endif %}
-                    </small>
+            <div class="card-body p-2">
+                <!-- Row 1: Checkbox + Date, H/A, Opposition -->
+                <div class="d-flex align-items-center lh-1">
+                    <input class="form-check-input match-checkbox me-2" type="checkbox" name="matches" value="{{ match.pk }}" id="match{{ match.pk }}">
+                    <label class="form-check-label" for="match{{ match.pk }}">
+                        <strong>{{ match.date|date:"D d M" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
+                    </label>
+                </div>
+                
+                <!-- Row 2: Venue, Time, Selected -->
+                <div class="small mt-1 fw-bold" style="margin-left: 1.5rem;">
+                    {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Selected: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}
+                </div>
+                
+                <!-- Row 3: My Status + Team Selection link -->
+                <div class="small mt-1" style="margin-left: 1.5rem;">
+                    <span class="text-dark">My status</span>:
+                    {% if match.is_selected %}
+                        <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">Selected</span>,
+                    {% else %}
+                        <span>-----</span>,
+                    {% endif %}
+                    <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">
+                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %}
+                    </span>
+                    <span class="text-muted">·</span>
+                    <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Team Selection</a>
                 </div>
             </div>
         </div>
@@ -47,6 +46,21 @@
     {% else %}
         <p class="text-muted">No matches scheduled.</p>
     {% endif %}
+    
+    <!-- Sticky bottom: buttons -->
+    <div class="position-sticky bottom-0 py-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+        <div class="d-flex justify-content-center gap-2 mb-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select All</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectNone()">Clear</button>
+            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+        </div>
+        <div class="d-flex justify-content-center align-items-center gap-2">
+            <span><strong>Set to:</strong></span>
+            <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
+            <button type="submit" name="availability" value="maybe" class="btn btn-mfm-warning btn-sm">Maybe</button>
+            <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Unavailable</button>
+        </div>
+    </div>
 </form>
 
 <script>

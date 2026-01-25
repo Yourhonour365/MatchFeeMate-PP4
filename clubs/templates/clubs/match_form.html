@@ -6,11 +6,11 @@
 <!-- Page heading -->
 <h1 class="mb-3">{% if match %}Edit Match{% else %}Schedule Match{% endif %}</h1>
 
-<div class="card card-mfm mb-3">
-    <div class="card-body">
-        <form method="post">
-            {% csrf_token %}
-            
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="card card-mfm mb-3">
+        <div class="card-body">
             {% for field in form %}
             <div class="mb-3">
                 <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
@@ -23,15 +23,17 @@
                 {% endif %}
             </div>
             {% endfor %}
-            
-            <!-- Action buttons -->
-            <div class="d-flex gap-2 mt-3">
-                <button type="submit" class="btn btn-mfm-primary flex-fill">Save</button>
-                <a href="{% if match %}{% url 'match_detail' pk=match.pk %}{% else %}{% url 'club_detail' pk=club.pk %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+    
+    <!-- Sticky bottom: buttons -->
+    <div class="position-sticky bottom-0 pt-2 pb-3" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary px-5">Back</a>
+            <button type="submit" class="btn btn-mfm-primary px-5">Save</button>
+        </div>
+    </div>
+</form>
 
 <script>
     // Add Bootstrap form-control class to all inputs
