@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Club, Player, Opposition, Match, MatchPlayer
 from .forms import ClubForm, PlayerForm, OppositionForm, MatchForm
 from django.core.exceptions import PermissionDenied
-
+from django.contrib import messages
 
 def home(request):
     """Display the homepage - redirect to club if user has one"""
@@ -240,6 +240,7 @@ def match_detail(request, pk):
     })
 
 @login_required
+@login_required
 def match_update(request, pk):
     """Edit an existing match"""
     match = get_object_or_404(Match, pk=pk)
@@ -250,13 +251,13 @@ def match_update(request, pk):
         form = MatchForm(request.POST, instance=match)
         if form.is_valid():
             form.save()
-            return redirect('match_detail', pk=match.pk)
+            messages.success(request, 'Match updated successfully.')
+            return redirect('match_update', pk=match.pk)
     else:
         form = MatchForm(instance=match)
         # Only show opposition teams for this club
         form.fields['opposition'].queryset = Opposition.objects.filter(club=match.club)
     return render(request, 'clubs/match_form.html', {'form': form, 'match': match, 'club': match.club})
-
 
 @login_required
 def match_delete(request, pk):
