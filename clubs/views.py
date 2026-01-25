@@ -541,17 +541,33 @@ def player_availability(request, player_pk):
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
         new_availability = request.POST.get('availability')
+        team_action = request.POST.get('team_action')
         
         for match_id in match_ids:
             match = Match.objects.get(pk=match_id)
             mp, created = MatchPlayer.objects.get_or_create(
                 match=match,
                 player=player,
-                defaults={'availability': new_availability}
+                defaults={'availability': 'maybe'}
             )
-            if not created:
+            
+            if new_availability:
                 mp.availability = new_availability
                 mp.save()
+            
+            if team_action == 'add':
+                mp.selected = True
+                mp.save()
+            elif team_action == 'remove':
+                mp.selected = False
+                mp.save()
+        
+        if new_availability:
+            messages.success(request, 'Availability updated successfully.')
+        elif team_action == 'add':
+            messages.success(request, 'Added to team.')
+        elif team_action == 'remove':
+            messages.success(request, 'Removed from team.')
         
         return redirect('player_availability', player_pk=player_pk)
     
