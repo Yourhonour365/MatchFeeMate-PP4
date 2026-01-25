@@ -18,16 +18,21 @@
     <div class="card card-mfm mb-3{% if match.status == 'cancelled' %} opacity-50{% elif match.status == 'completed' %} opacity-75{% endif %}">
         <div class="card-body">
             {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+            {% else %}
             <div class="mb-3">
-                <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
-                {{ field }}
-                {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-                {% endif %}
-                {% if field.errors %}
-                <div class="text-danger small">{{ field.errors }}</div>
-                {% endif %}
+                    {% if field.id_for_label %}
+                    <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                    {% else %}
+                    <label class="form-label"><strong>{{ field.label }}</strong></label>
+                    {% endif %}
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="text-danger small">{{ field.errors }}</div>
+                    {% endif %}
             </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>

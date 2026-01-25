@@ -34,16 +34,21 @@
             {% if not club %}<h5 class="card-title mb-3">Club details</h5>{% endif %}
             
             {% for field in form %}
-            <div class="mb-3">
-                <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+            {% if field.is_hidden %}
                 {{ field }}
-                {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% else %}
+            <div class="mb-3">
+                {% if field.id_for_label %}
+                <label class="form-label" for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label>
+                {% else %}
+                <label class="form-label"><strong>{{ field.label }}</strong></label>
                 {% endif %}
+                {{ field }}
                 {% if field.errors %}
                 <div class="text-danger small">{{ field.errors }}</div>
                 {% endif %}
             </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
