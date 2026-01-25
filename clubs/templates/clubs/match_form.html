@@ -6,13 +6,16 @@
 <!-- Page heading -->
 <h1 class="mb-3">{% if match %}Edit Match{% else %}Schedule Match{% endif %}</h1>
 {% if match %}
-<p class="small mb-3">Team: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}</p>
+<p class="small mb-3">
+    <span class="{% if match.status == 'cancelled' %}text-danger{% elif match.status == 'completed' %}text-success fst-italic{% endif %}">{{ match.get_status_display }}</span> · 
+    Team: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}
+</p>
 {% endif %}
 
 <form method="post">
     {% csrf_token %}
     
-    <div class="card card-mfm mb-3">
+    <div class="card card-mfm mb-3{% if match.status == 'cancelled' %} opacity-50{% elif match.status == 'completed' %} opacity-75{% endif %}">
         <div class="card-body">
             {% for field in form %}
             <div class="mb-3">

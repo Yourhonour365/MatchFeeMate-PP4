@@ -5,13 +5,15 @@
 {% block content %}
 <h1 class="h5 mb-3 text-success">Availability</h1>
 <!-- Match header - consistent with match list -->
-<div class="card card-mfm mb-3">
+<div class="card card-mfm mb-3{% if match.status == 'cancelled' %} opacity-50{% elif match.status == 'completed' %} opacity-75{% endif %}">
     <div class="card-body p-2">
         <div class="lh-1">
             <strong>{{ match.date|date:"D d M" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
         </div>
         <div class="small mt-1">
-            {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Team: <span class="{% if selected_players|length >= 11 %}text-success{% else %}text-warning{% endif %}">{{ selected_players|length }}/11</span>{% if selected_players|length >= 11 %} <em class="text-success">Full</em>{% endif %}
+            {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · 
+            <span class="{% if match.status == 'cancelled' %}text-danger{% elif match.status == 'completed' %}text-success fst-italic{% endif %}">{{ match.get_status_display }}</span> · 
+            Team: <span class="{% if selected_players|length >= 11 %}text-success{% else %}text-warning{% endif %}">{{ selected_players|length }}/11</span>{% if selected_players|length >= 11 %} <em class="text-success">Full</em>{% endif %}
         </div>
     </div>
 </div>
