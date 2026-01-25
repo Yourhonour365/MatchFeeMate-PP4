@@ -346,6 +346,7 @@ def team_selection(request, match_pk):
             )
             match_player.selected = str(player.pk) in selected_ids
             match_player.save()
+        messages.success(request, 'Team selection updated successfully.')
         return redirect('team_selection', match_pk=match_pk)
     
     return render(request, 'clubs/team_selection.html', {
