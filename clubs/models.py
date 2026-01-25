@@ -23,13 +23,13 @@ class Club(models.Model):
 
 class Player(models.Model):
     """A player/member belonging to a club"""
-    
+
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('captain', 'Captain'),
         ('player', 'Player'),
     ]
-    
+
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name='players'
     )
@@ -40,7 +40,8 @@ class Player(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(blank=True)
     phone = models.CharField(max_length=20, blank=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='player')
+    role = models.CharField(
+        max_length=10, choices=ROLE_CHOICES, default='player')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -53,29 +54,29 @@ class Player(models.Model):
 
 class Opposition(models.Model):
     """Opposition teams that the club plays against"""
-    
+
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name='oppositions'
     )
     name = models.CharField(max_length=100)
     home_ground = models.CharField(max_length=100, blank=True)
-    
+
     class Meta:
         ordering = ['name']
-    
+
     def __str__(self):
         return self.name
 
 
 class Match(models.Model):
     """A scheduled cricket match"""
-    
+
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]
-    
+
     club = models.ForeignKey(
         Club, on_delete=models.CASCADE, related_name='matches'
     )
@@ -96,23 +97,23 @@ class Match(models.Model):
 
     def __str__(self):
         return f"{self.club.name} vs {self.opposition.name} - {self.date}"
-    
+
     def selected_count(self):
         """Count players who are selected"""
         return self.match_players.filter(selected=True).count()
-    
+
     def available_count(self):
         """Count players who are available"""
         return self.match_players.filter(availability='yes').count()
-    
+
     def maybe_count(self):
         """Count players who are maybe"""
         return self.match_players.filter(availability='maybe').count()
-    
+
     def unavailable_count(self):
         """Count players who are not available"""
         return self.match_players.filter(availability='no').count()
-    
+
     def awaiting_count(self):
         """Count players with no response yet"""
         total_players = self.club.players.filter(is_active=True).count()
@@ -122,13 +123,13 @@ class Match(models.Model):
 
 class MatchPlayer(models.Model):
     """Links players to matches - tracks availability and selection"""
-    
+
     AVAILABILITY_CHOICES = [
         ('yes', 'Available'),
         ('no', 'Not Available'),
         ('maybe', 'Maybe'),
     ]
-    
+
     match = models.ForeignKey(
         Match, on_delete=models.CASCADE, related_name='match_players'
     )
@@ -139,9 +140,9 @@ class MatchPlayer(models.Model):
         max_length=5, choices=AVAILABILITY_CHOICES, default='maybe'
     )
     selected = models.BooleanField(default=False)
-    
+
     class Meta:
         unique_together = ['match', 'player']
-    
+
     def __str__(self):
         return f"{self.player.name} - {self.match}"

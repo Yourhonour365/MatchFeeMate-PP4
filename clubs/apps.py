@@ -6,4 +6,4 @@ class ClubsConfig(AppConfig):
     name = 'clubs'
 
     def ready(self):
-        import clubs.signals
+        import clubs.signals  # noqa: F401
