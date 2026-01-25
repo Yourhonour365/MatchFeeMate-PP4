@@ -28,7 +28,7 @@
                 
                 <!-- Row 3: My Status + Team Selection link -->
                 <div class="small mt-1" style="margin-left: 1.5rem;">
-                    <span class="text-dark">My status</span>:
+                    <span class="text-dark">{% if is_admin_view %}Status{% else %}My status{% endif %}</span>:
                     {% if match.is_selected %}
                         <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger{% endif %}">Selected</span>,
                     {% else %}

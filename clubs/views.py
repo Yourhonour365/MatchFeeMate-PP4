@@ -507,6 +507,7 @@ def player_availability(request, player_pk):
         mp = MatchPlayer.objects.filter(match=match, player=player).first()
         match.my_availability = mp.availability if mp else None
         match.is_selected = mp.selected if mp else False
+        match.selected_count = MatchPlayer.objects.filter(match=match, selected=True).count()
     
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')

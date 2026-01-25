@@ -21,7 +21,7 @@
             </span>
             {% if is_admin_or_captain %}
             <div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="btn btn-mfm-dark-blue btn-sm">Availability</a>
+                <a href="{% url 'player_availability' player_pk=player.pk %}" class="text-decoration-underline text-success me-2">Availability</a>
                 <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
                 <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
             </div>
