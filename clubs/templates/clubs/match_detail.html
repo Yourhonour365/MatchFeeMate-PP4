@@ -118,24 +118,22 @@
     </div>
 </div>
 {% endif %}
-{% endif %}
-
-<!-- Your Availability at bottom - all players can see -->
-<div class="card card-mfm mb-3">
-    <div class="card-body py-2">
-        <strong class="small">Your Availability:</strong>
-        <div class="d-flex gap-2 mt-1">
-            <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm flex-fill d-flex align-items-center justify-content-center">Available</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-mfm-warning btn-sm flex-fill d-flex align-items-center justify-content-center">Maybe</a>
-            <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm flex-fill d-flex align-items-center justify-content-center">Unavailable</a>
-        </div>
-    </div>
-</div>
 
 <!-- Delete link - admin/captain only -->
-{% if is_admin_or_captain %}
-<div class="text-center">
+<div class="text-center mb-3">
     <small><a href="{% url 'match_delete' pk=match.pk %}" class="text-danger">Delete match</a></small>
 </div>
 {% endif %}
+
+<!-- Your Availability at bottom - all players can see -->
+<div class="position-sticky bottom-0 py-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+    <div class="d-flex justify-content-center flex-wrap gap-2 mb-2">
+        <a href="{% url 'set_availability' match_pk=match.pk availability='yes' %}" class="btn btn-success btn-sm">Available</a>
+        <a href="{% url 'set_availability' match_pk=match.pk availability='maybe' %}" class="btn btn-mfm-warning btn-sm">Maybe</a>
+        <a href="{% url 'set_availability' match_pk=match.pk availability='no' %}" class="btn btn-danger btn-sm">Unavailable</a>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+    </div>
+</div>
 {% endblock %}

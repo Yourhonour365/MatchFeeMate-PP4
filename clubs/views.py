@@ -34,6 +34,7 @@ def club_create(request):
                 phone=request.POST.get('admin_phone', ''),
                 role='admin'
             )
+            messages.success(request, 'Club created successfully.')
             return redirect('club_detail', pk=club.pk)
     else:
         # Show empty form
@@ -64,12 +65,12 @@ def club_update(request, pk):
         form = ClubForm(request.POST, instance=club)
         if form.is_valid():
             form.save()
-            return redirect('club_detail', pk=club.pk)
+            messages.success(request, 'Club updated successfully.')
+            return redirect('club_update', pk=club.pk)
     else:
         # Show form pre-filled with current data
         form = ClubForm(instance=club)
     return render(request, 'clubs/club_form.html', {'form': form, 'club': club})
-
 
 @login_required
 def club_delete(request, pk):
@@ -96,7 +97,10 @@ def player_create(request, club_pk):
             player = form.save(commit=False)
             player.club = club
             player.save()
-            return redirect('club_detail', pk=club.pk)
+            messages.success(request, 'Player added successfully.')
+            if 'add_another' in request.POST:
+                return redirect('player_create', club_pk=club.pk)
+            return redirect('player_availability', player_pk=player.pk)
     else:
         form = PlayerForm()
     return render(request, 'clubs/player_form.html', {'form': form, 'club': club})
@@ -145,7 +149,8 @@ def opposition_create(request, club_pk):
             opposition = form.save(commit=False)
             opposition.club = club
             opposition.save()
-            return redirect('club_detail', pk=club.pk)
+            messages.success(request, 'Opposition added successfully.')
+            return redirect('opposition_create', club_pk=club.pk)
     else:
         form = OppositionForm()
     return render(request, 'clubs/opposition_form.html', {'form': form, 'club': club})
@@ -162,7 +167,8 @@ def opposition_update(request, pk):
         form = OppositionForm(request.POST, instance=opposition)
         if form.is_valid():
             form.save()
-            return redirect('club_detail', pk=opposition.club.pk)
+            messages.success(request, 'Opposition updated successfully.')
+            return redirect('opposition_update', pk=opposition.pk)
     else:
         form = OppositionForm(instance=opposition)
     return render(request, 'clubs/opposition_form.html', {'form': form, 'opposition': opposition, 'club': opposition.club})
@@ -201,7 +207,8 @@ def match_create(request, club_pk):
                 else:
                     match.venue = match.opposition.home_ground
             match.save()
-            return redirect('match_detail', pk=match.pk)
+            messages.success(request, 'Match created successfully.')
+            return redirect('team_selection', match_pk=match.pk)
     else:
         form = MatchForm(initial={'match_fee': club.default_match_fee, 'time': '13:00'})
         # Only show opposition teams for this club
@@ -315,12 +322,13 @@ def team_selection(request, match_pk):
     selected_players = []
     available_players = []
     maybe_players = []
+    awaiting_players = []
     unavailable_players = []
     
     for player in players:
         mp = match.match_players.filter(player=player).first()
         player.is_selected = mp.selected if mp else False
-        player.availability = mp.availability if mp else 'maybe'
+        player.availability = mp.availability if mp else None
         player.is_current_user = (player == current_player)
         
         if player.is_selected:
@@ -329,6 +337,8 @@ def team_selection(request, match_pk):
             available_players.append(player)
         elif player.availability == 'maybe':
             maybe_players.append(player)
+        elif player.availability is None:
+            awaiting_players.append(player)
         else:
             unavailable_players.append(player)
     
@@ -354,6 +364,7 @@ def team_selection(request, match_pk):
         'selected_players': selected_players,
         'available_players': available_players,
         'maybe_players': maybe_players,
+        'awaiting_players': awaiting_players,
         'unavailable_players': unavailable_players,
         'unavailable_selected': unavailable_selected,
     })
@@ -538,9 +549,12 @@ def my_availability(request):
         
         return redirect('my_availability')
     
+    is_admin_or_captain = player.club.is_admin_or_captain(request.user)
+    
     return render(request, 'clubs/my_availability.html', {
         'matches': matches,
         'player': player,
+        'is_admin_or_captain': is_admin_or_captain,
     })
 
 @login_required

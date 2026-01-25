@@ -27,32 +27,30 @@
                 <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}{% endif %}
             </div>
             
-            <!-- Row 3: My Status -->
+            <!-- Row 3: Me - Availability, Selection -->
             <div class="small mt-1">
-                <a href="{% url 'my_availability' %}" class="text-decoration-underline text-dark">My status</a>:
-                {% if match.is_selected %}
-                    <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">Selected</span>,
-                    <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
-                    </span>
-                {% else %}
-                    <span>-----</span>,
-                    <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
-                    </span>
+                <span class="text-dark">Me:</span>
+                <a href="{% url 'my_availability' %}" class="text-decoration-underline {% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% elif match.my_availability == 'no' %}text-danger{% else %}text-muted{% endif %}">
+                    {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %},
+                    {% if match.is_selected %}Selected{% else %}-----{% endif %}
+                </a>
+                {% if not is_admin_or_captain %}
+                <span class="text-muted">·</span>
+                <a href="{% url 'match_detail' pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">View Team</a>
                 {% endif %}
             </div>
             
-            <!-- Row 4: Links -->
+            <!-- Row 4: Team links (admin only) -->
+            {% if is_admin_or_captain %}
             <div class="small mt-1">
-                {% if is_admin_or_captain %}
-                <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Team Selection</a>
+                <span class="text-dark">Team:</span>
+                <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Selection</a>
                 <span class="text-muted">·</span>
                 <a href="{% url 'bulk_availability' match_pk=match.pk %}" class="text-decoration-underline text-success">Availability ({{ match.available_count }})</a>
                 <span class="text-muted">·</span>
                 <a href="{% url 'match_update' pk=match.pk %}" class="text-decoration-underline" style="color: #2b1d0e;">Edit Match</a>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
