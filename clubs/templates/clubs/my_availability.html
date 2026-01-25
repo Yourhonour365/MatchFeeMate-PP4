@@ -11,7 +11,7 @@
     <!-- Match list -->
     {% if matches %}
         {% for match in matches %}
-        <div class="card card-mfm mb-2">
+        <div class="card card-mfm mb-2{% if match.status == 'cancelled' %} opacity-50{% elif match.status == 'completed' %} opacity-75{% endif %}">
             <div class="card-body p-2">
                 <!-- Row 1: Checkbox + Date, H/A, Opposition -->
                 <div class="d-flex align-items-center lh-1">
@@ -21,9 +21,11 @@
                     </label>
                 </div>
                 
-                <!-- Row 2: Venue, Time, Selected -->
+                <!-- Row 2: Venue, Time, Status, Team -->
                 <div class="small mt-1 fw-bold" style="margin-left: 1.5rem;">
-                    {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Selected: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}
+                    {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · 
+                    <span class="{% if match.status == 'cancelled' %}text-danger{% elif match.status == 'completed' %}text-success fw-normal fst-italic{% endif %}">{{ match.get_status_display }}</span>{% if match.status != 'completed' %} · 
+                    Team: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}{% endif %}
                 </div>
                 
                 <!-- Row 3: My Status + Team Selection link -->

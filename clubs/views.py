@@ -436,11 +436,20 @@ def bulk_availability(request, match_pk):
 @login_required
 def match_list(request):
     """List all matches for user's club"""
+    from django.db.models import Case, When, Value, IntegerField
+    
     player = Player.objects.filter(user=request.user).first()
     if not player:
         return redirect('home')
     
-    matches = Match.objects.filter(club=player.club).order_by('date')
+    matches = Match.objects.filter(club=player.club).annotate(
+        status_order=Case(
+            When(status='scheduled', then=Value(0)),
+            When(status='completed', then=Value(1)),
+            When(status='cancelled', then=Value(2)),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', 'date')
     
     # Get current user's availability and selection status for each match
     for match in matches:
@@ -474,11 +483,20 @@ def player_list(request):
 @login_required
 def my_availability(request):
     """Player updates their own availability across all matches"""
+    from django.db.models import Case, When, Value, IntegerField
+    
     player = Player.objects.filter(user=request.user).first()
     if not player:
         return redirect('home')
     
-    matches = Match.objects.filter(club=player.club).order_by('date')
+    matches = Match.objects.filter(club=player.club).annotate(
+        status_order=Case(
+            When(status='scheduled', then=Value(0)),
+            When(status='completed', then=Value(1)),
+            When(status='cancelled', then=Value(2)),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', 'date')
     
     # Get current availability and selected count for each match
     for match in matches:
@@ -528,13 +546,22 @@ def my_availability(request):
 @login_required
 def player_availability(request, player_pk):
     """Admin/captain updates a player's availability across all matches"""
+    from django.db.models import Case, When, Value, IntegerField
+    
     player = get_object_or_404(Player, pk=player_pk)
     
     # Permission check
     if not player.club.is_admin_or_captain(request.user):
         raise PermissionDenied
     
-    matches = Match.objects.filter(club=player.club).order_by('date')
+    matches = Match.objects.filter(club=player.club).annotate(
+        status_order=Case(
+            When(status='scheduled', then=Value(0)),
+            When(status='completed', then=Value(1)),
+            When(status='cancelled', then=Value(2)),
+            output_field=IntegerField(),
+        )
+    ).order_by('status_order', 'date')
     
     # Get current availability for each match
     for match in matches:
