@@ -34,7 +34,7 @@
                         {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
                     </span>
                 {% else %}
-                    <span>—</span>,
+                    <span>-----</span>,
                     <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% else %}text-danger {% endif %}">
                         {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% else %}Unavailable{% endif %}
                     </span>
