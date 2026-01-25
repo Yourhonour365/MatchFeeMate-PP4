@@ -54,11 +54,14 @@
             <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectNone()">Clear</button>
             <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Back</a>
         </div>
-        <div class="d-flex justify-content-center align-items-center gap-2">
-            <span><strong>Set to:</strong></span>
+        <div class="d-flex justify-content-center gap-2 mb-2">
             <button type="submit" name="availability" value="yes" class="btn btn-success btn-sm">Available</button>
             <button type="submit" name="availability" value="maybe" class="btn btn-mfm-warning btn-sm">Maybe</button>
             <button type="submit" name="availability" value="no" class="btn btn-danger btn-sm">Unavailable</button>
+        </div>
+        <div class="d-flex justify-content-center gap-2">
+            <button type="submit" name="team_action" value="add" class="btn btn-mfm-primary btn-sm">Add to Team</button>
+            <button type="submit" name="team_action" value="remove" class="btn btn-outline-danger btn-sm">Remove from Team</button>
         </div>
     </div>
 </form>

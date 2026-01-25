@@ -394,19 +394,29 @@ def bulk_availability(request, match_pk):
     if request.method == 'POST':
         selected_ids = request.POST.getlist('players')
         new_availability = request.POST.get('availability')
+        team_action = request.POST.get('team_action')
         
         for player_id in selected_ids:
             player = Player.objects.get(pk=player_id)
             match_player, created = MatchPlayer.objects.get_or_create(
                 match=match,
                 player=player,
-                defaults={'availability': new_availability}
+                defaults={'availability': 'maybe'}
             )
-            if not created:
+            
+            if new_availability:
                 match_player.availability = new_availability
-                match_player.save()
+                messages.success(request, 'Availability updated successfully.')
+            
+            if team_action == 'add':
+                match_player.selected = True
+                messages.success(request, 'Players added to team.')
+            elif team_action == 'remove':
+                match_player.selected = False
+                messages.success(request, 'Players removed from team.')
+            
+            match_player.save()
         
-        messages.success(request, 'Availability updated successfully.')
         return redirect('bulk_availability', match_pk=match_pk)
     
     return render(request, 'clubs/bulk_availability.html', {
@@ -475,19 +485,34 @@ def my_availability(request):
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
         new_availability = request.POST.get('availability')
+        team_action = request.POST.get('team_action')
         
         for match_id in match_ids:
             match = Match.objects.get(pk=match_id)
             mp, created = MatchPlayer.objects.get_or_create(
                 match=match,
                 player=player,
-                defaults={'availability': new_availability}
+                defaults={'availability': 'maybe'}
             )
-            if not created:
+            
+            if new_availability:
                 mp.availability = new_availability
                 mp.save()
+            
+            if team_action == 'add':
+                mp.selected = True
+                mp.save()
+            elif team_action == 'remove':
+                mp.selected = False
+                mp.save()
         
-        messages.success(request, 'Availability updated successfully.')
+        if new_availability:
+            messages.success(request, 'Availability updated successfully.')
+        elif team_action == 'add':
+            messages.success(request, 'Added to team.')
+        elif team_action == 'remove':
+            messages.success(request, 'Removed from team.')
+        
         return redirect('my_availability')
     
     return render(request, 'clubs/my_availability.html', {
