@@ -11,7 +11,7 @@
             <strong>{{ match.date|date:"D d M" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
         </div>
         <div class="small mt-1">
-            {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Selected: <span class="{% if selected_players|length >= 11 %}text-success{% else %}text-warning{% endif %}">{{ selected_players|length }}/11</span>{% if selected_players|length >= 11 %} <em class="text-success">Full</em>{% endif %}
+            {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · Team: <span class="{% if selected_players|length >= 11 %}text-success{% else %}text-warning{% endif %}">{{ selected_players|length }}/11</span>{% if selected_players|length >= 11 %} <em class="text-success">Full</em>{% endif %}
         </div>
     </div>
 </div>
@@ -35,7 +35,7 @@
                             <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="selected_{{ player.pk }}">
                             <label class="form-check-label" for="selected_{{ player.pk }}">{{ player.name }}</label>
                         </div>
-                        <small class="{% if player.current_availability == 'Available' %}text-success{% elif player.current_availability == 'Maybe' %}text-warning{% else %}text-danger{% endif %}">{{ player.current_availability }}</small>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline {% if player.current_availability == 'Available' %}text-success{% elif player.current_availability == 'Maybe' %}text-warning{% else %}text-danger{% endif %}">{{ player.current_availability }}</a>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players selected yet.</p>
@@ -59,7 +59,7 @@
                             <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="avail_{{ player.pk }}">
                             <label class="form-check-label" for="avail_{{ player.pk }}">{{ player.name }}</label>
                         </div>
-                        <small class="text-success">Available</small>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-success">Available</a>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players available.</p>
@@ -83,7 +83,7 @@
                             <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
                             <label class="form-check-label" for="maybe_{{ player.pk }}">{{ player.name }}</label>
                         </div>
-                        <small class="text-warning">Maybe</small>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-warning">Maybe</a>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players with maybe status.</p>
@@ -107,7 +107,7 @@
                             <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="awaiting_{{ player.pk }}">
                             <label class="form-check-label" for="awaiting_{{ player.pk }}">{{ player.name }}</label>
                         </div>
-                        <small class="text-muted">Awaiting</small>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-muted">Awaiting</a>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players awaiting response.</p>
@@ -131,7 +131,7 @@
                             <input class="form-check-input" type="checkbox" name="players" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
                             <label class="form-check-label" for="unavail_{{ player.pk }}">{{ player.name }}</label>
                         </div>
-                        <small class="text-danger">Unavailable</small>
+                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-danger">Unavailable</a>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players unavailable.</p>

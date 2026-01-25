@@ -5,6 +5,9 @@
 {% block content %}
 <!-- Page heading -->
 <h1 class="mb-3">{% if match %}Edit Match{% else %}Schedule Match{% endif %}</h1>
+{% if match %}
+<p class="small mb-3">Team: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}</p>
+{% endif %}
 
 <form method="post">
     {% csrf_token %}

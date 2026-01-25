@@ -406,16 +406,21 @@ def bulk_availability(request, match_pk):
             
             if new_availability:
                 match_player.availability = new_availability
-                messages.success(request, 'Availability updated successfully.')
             
             if team_action == 'add':
                 match_player.selected = True
-                messages.success(request, 'Players added to team.')
             elif team_action == 'remove':
                 match_player.selected = False
-                messages.success(request, 'Players removed from team.')
             
             match_player.save()
+        
+        if selected_ids:
+            if new_availability:
+                messages.success(request, 'Availability updated successfully.')
+            elif team_action == 'add':
+                messages.success(request, 'Added to team.')
+            elif team_action == 'remove':
+                messages.success(request, 'Removed from team.')
         
         return redirect('bulk_availability', match_pk=match_pk)
     
