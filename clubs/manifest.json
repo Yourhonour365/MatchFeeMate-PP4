@@ -1,6 +1,6 @@
 {
     "name": "MatchFeeMate",
-    "short_name": "MFM",
+    "short_name": "MatchFeeMate",
     "icons": [
         {
             "src": "/static/images/android-chrome-192x192.png",
