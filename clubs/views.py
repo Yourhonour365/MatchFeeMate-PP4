@@ -1,3 +1,4 @@
+from re import match
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Club, Player, Opposition, Match, MatchPlayer
@@ -260,7 +261,6 @@ def match_detail(request, pk):
 
 
 @login_required
-@login_required
 def match_update(request, pk):
     """Edit an existing match"""
     match = get_object_or_404(Match, pk=pk)
@@ -487,9 +487,10 @@ def match_list(request):
         mp = MatchPlayer.objects.filter(match=match, player=player).first()
         match.my_availability = mp.availability if mp else None
         match.is_selected = mp.selected if mp else False
-        match.maybe_count = match.match_players.filter(
-            availability='maybe').count()
-
+        match.selected_count = match.match_players.filter(selected=True).count()
+        match.available_count = match.match_players.filter(availability='yes', selected=False).count()
+        match.maybe_count = match.match_players.filter(availability='maybe', selected=False).count()
+    
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
         'matches': matches,

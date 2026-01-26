@@ -156,4 +156,36 @@
         </div>
     </div>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const openSection = urlParams.get('open');
+        
+        if (openSection) {
+            // Close the default open accordion (Selected)
+            const selectedAccordion = document.getElementById('selectedPlayers');
+            if (selectedAccordion) {
+                selectedAccordion.classList.remove('show');
+                selectedAccordion.previousElementSibling.querySelector('button').classList.add('collapsed');
+            }
+            
+            // Open the requested accordion
+            let targetId = null;
+            if (openSection === 'available') {
+                targetId = 'availablePlayers';
+            } else if (openSection === 'maybe') {
+                targetId = 'maybePlayers';
+            }
+            
+            if (targetId) {
+                const targetAccordion = document.getElementById(targetId);
+                if (targetAccordion) {
+                    targetAccordion.classList.add('show');
+                    targetAccordion.previousElementSibling.querySelector('button').classList.remove('collapsed');
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
