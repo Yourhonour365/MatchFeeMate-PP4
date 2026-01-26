@@ -35,7 +35,7 @@
                     <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
                         <div>
                             <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">{{ player.name }}</label>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
                         </div>
                         <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline {% if player.availability == 'yes' %}text-success{% elif player.availability == 'maybe' %}text-warning{% elif player.availability is None %}text-muted{% else %}text-danger{% endif %}">
                             {% if player.availability == 'yes' %}Available{% elif player.availability == 'maybe' %}Maybe{% elif player.availability is None %}Awaiting{% else %}Unavailable{% endif %}
@@ -61,7 +61,7 @@
                     <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
                         <div>
                             <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">{{ player.name }}</label>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
                         </div>
                         <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-success">Available</a>
                     </div>
@@ -85,7 +85,7 @@
                     <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
                         <div>
                             <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">{{ player.name }}</label>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
                         </div>
                         <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-warning">Maybe</a>
                     </div>
@@ -109,7 +109,7 @@
                     <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
                         <div>
                             <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="awaiting_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="awaiting_{{ player.pk }}">{{ player.name }}</label>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="awaiting_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
                         </div>
                         <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-muted">Awaiting</a>
                     </div>
@@ -124,7 +124,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button collapsed bg-danger-subtle text-dark py-2" type="button" data-bs-toggle="collapse" data-bs-target="#unavailablePlayers" aria-expanded="false">
-                    <strong>Not Available ({{ unavailable_players|length }})</strong>
+                    <strong>Unavailable ({{ unavailable_players|length }})</strong>
                 </button>
             </h2>
             <div id="unavailablePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
@@ -133,7 +133,7 @@
                     <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
                         <div>
                             <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">{{ player.name }}</label>
+                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
                         </div>
                         <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-danger">Unavailable</a>
                     </div>
