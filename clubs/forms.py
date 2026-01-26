@@ -12,7 +12,7 @@ class PlayerForm(forms.ModelForm):
     """Form for creating and editing players"""
     class Meta:
         model = Player
-        fields = ['name', 'email', 'phone']
+        fields = ['name', 'email', 'phone', 'role']
         widgets = {
             'phone': forms.TextInput(attrs={'type': 'tel'}),
         }
