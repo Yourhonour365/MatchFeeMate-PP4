@@ -22,7 +22,7 @@
             
             <!-- Row 2: Venue, Time, Status -->
             <div class="small mt-1">
-                {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · 
+                {{ match.venue|default:"TBC" }} · {{ match.time|time:"H:i"|default:"TBC" }} · 
                 <span class="{% if match.status == 'cancelled' %}text-danger{% elif match.status == 'completed' %}text-success fst-italic{% endif %}">{{ match.get_status_display }}</span>
             </div>
             

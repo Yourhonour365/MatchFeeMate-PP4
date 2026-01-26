@@ -3,7 +3,7 @@
 {% block title %}{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %} - MatchFeeMate{% endblock %}
 
 {% block content %}
-<h1 class="h5 mb-3 text-success">{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %}</h1>
+<h1 class="h5 mb-3 text-success">{% if is_admin_view %}{{ player.name }}'s Matches & Availability{% else %}My Matches & Availability{% endif %}</h1>
 
 <div class="d-flex gap-2 mb-3">
     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select All</button>
@@ -18,33 +18,22 @@
         {% for match in matches %}
         <div class="card card-mfm mb-2{% if match.status == 'cancelled' %} opacity-50{% elif match.status == 'completed' %} opacity-75{% endif %}">
             <div class="card-body p-2">
-                <!-- Row 1: Checkbox + Date, H/A, Opposition -->
+                <!-- Row 1: Checkbox + Date, H/A, Opposition, Time -->
                 <div class="d-flex align-items-center lh-1">
                     <input class="form-check-input match-checkbox me-2" type="checkbox" name="matches" value="{{ match.pk }}" id="match{{ match.pk }}">
                     <label class="form-check-label" for="match{{ match.pk }}">
-                        <strong>{{ match.date|date:"D d M" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
+                        <strong>{{ match.date|date:"D d M" }} {{ match.time|time:"H:i"|default:"TBC" }} ({% if match.is_home %}H{% else %}A{% endif %}) v {{ match.opposition.name }}</strong>
                     </label>
                 </div>
                 
-                <!-- Row 2: Venue, Time, Status, Team -->
+                <!-- Row 2: Availability, Selection · Team count -->
                 <div class="small mt-1 fw-bold" style="margin-left: 1.5rem;">
-                    {{ match.venue|default:"TBC" }} · {{ match.time|time:"g:ia"|default:"TBC" }} · 
-                    <span class="{% if match.status == 'cancelled' %}text-danger{% elif match.status == 'completed' %}text-success fw-normal fst-italic{% endif %}">{{ match.get_status_display }}</span>{% if match.status != 'completed' %} · 
-                    Team: <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11</span>{% if match.selected_count >= 11 %} <em class="text-success">Full</em>{% endif %}{% endif %}
-                </div>
-                
-                <!-- Row 3: Availability, Selection, Team link -->
-                <div class="small mt-1" style="margin-left: 1.5rem;">
                     <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% elif match.my_availability == 'no' %}text-danger{% else %}text-muted{% endif %}">
-                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %},
-                        {% if match.is_selected %}Selected{% else %}-----{% endif %}
+                        {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %}{% if match.is_selected %}, Selected{% endif %}
                     </span>
                     <span class="text-muted">·</span>
-                    {% if is_admin_view or is_admin_or_captain %}
-                    <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Team Selection</a>
-                    {% else %}
-                    <a href="{% url 'match_detail' pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">View Team</a>
-                    {% endif %}
+                    <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Team:</a>
+                    <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11{% if match.selected_count >= 11 %} Full{% endif %}</span>
                 </div>
             </div>
         </div>
