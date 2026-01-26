@@ -43,6 +43,14 @@
     </div>
 </form>
 
+{% if player %}
+<hr class="my-4">
+<div class="d-flex justify-content-between align-items-center">
+    <span class="text-muted small">Remove this player from the club</span>
+    <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-outline-danger btn-sm">Delete Player</a>
+</div>
+{% endif %}
+
 <script>
     // Add Bootstrap form-control class to all inputs
     document.querySelectorAll('input, select, textarea').forEach(el => {

@@ -15,16 +15,12 @@
     {% for player in players %}
     <div class="card card-mfm mb-2">
         <div class="card-body py-2 d-flex justify-content-between align-items-center">
-            <span>
-                {{ player.name }}
-                {% if player.role != 'player' %}<span class="badge bg-secondary ms-2">{{ player.get_role_display }}</span>{% endif %}
-            </span>
-            {% if is_admin_or_captain %}
             <div>
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="text-decoration-underline text-success me-2">Availability</a>
-                <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
-                <a href="{% url 'player_delete' pk=player.pk %}" class="btn btn-mfm-danger btn-sm">Delete</a>
+                <span class="fw-medium">{{ player.name }}</span>{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                <a href="{% url 'player_availability' player_pk=player.pk %}" class="ms-3 text-success">Availability</a>
             </div>
+            {% if is_admin_or_captain %}
+            <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
             {% endif %}
         </div>
     </div>
@@ -33,4 +29,3 @@
     <p class="text-muted">No players yet.</p>
 {% endif %}
 {% endblock %}
-

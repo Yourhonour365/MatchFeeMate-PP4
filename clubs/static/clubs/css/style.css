@@ -255,3 +255,10 @@ a:hover {
 .text-warning {
     color: #E65100 !important;
 }
+
+.admin-badge {
+    font-size: 0.65rem;
+    color: #6c757d;
+    margin-left: 2px;
+    font-weight: normal;
+}
