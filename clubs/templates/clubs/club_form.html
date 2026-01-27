@@ -56,7 +56,7 @@
     <!-- Action buttons -->
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-mfm-primary flex-fill">{% if club %}Save{% else %}Create Club{% endif %}</button>
-        <a href="{% if club %}{% url 'club_detail' pk=club.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+        <a href="{% if club %}{% url 'club_detail' pk=club.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-outline-secondary">Exit</a>
     </div>
 </form>
 

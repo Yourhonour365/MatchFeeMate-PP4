@@ -3,7 +3,7 @@
 {% block title %}{% if is_admin_view %}{{ player.name }}'s Availability{% else %}My Availability{% endif %} - MatchFeeMate{% endblock %}
 
 {% block content %}
-<h1 class="h5 mb-3 text-success">{% if is_admin_view %}{{ player.name }}'s Matches & Availability{% else %}My Matches & Availability{% endif %}</h1>
+<h1 class="h5 mb-3 text-success">{% if is_admin_view %}{{ player.name }}'s Participation{% else %}My Participation{% endif %}</h1>
 
 <div class="d-flex gap-2 mb-3">
     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select All</button>
@@ -56,7 +56,7 @@
         </div>
         {% endif %}
         <div class="d-flex justify-content-center">
-            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Exit</a>
         </div>
     </div>
 </form>
