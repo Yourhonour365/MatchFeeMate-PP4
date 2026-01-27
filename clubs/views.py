@@ -464,7 +464,7 @@ def team_selection(request, match_pk):
                 match_player, created = MatchPlayer.objects.get_or_create(
                     match=current_match,
                     player_id=player_id,
-                    defaults={'availability': None}
+                    defaults={'availability': 'yes'}
                 )
                 match_player.selected = True
                 match_player.save()
@@ -479,7 +479,7 @@ def team_selection(request, match_pk):
                 match_player, created = MatchPlayer.objects.get_or_create(
                     match=current_match,
                     player_id=player_id,
-                    defaults={'availability': None}
+                    defaults={'availability': 'yes'}
                 )
                 match_player.selected = False
                 match_player.save()
@@ -614,7 +614,7 @@ def bulk_availability(request, match_pk):
                 match_player, created = MatchPlayer.objects.get_or_create(
                     match=current_match,
                     player_id=player_id,
-                    defaults={'availability': None}
+                    defaults={'availability': 'yes'}
                 )
                 match_player.selected = True
                 match_player.save()
@@ -629,7 +629,7 @@ def bulk_availability(request, match_pk):
                 match_player, created = MatchPlayer.objects.get_or_create(
                     match=current_match,
                     player_id=player_id,
-                    defaults={'availability': None}
+                    defaults={'availability': 'yes'}
                 )
                 match_player.selected = False
                 match_player.save()

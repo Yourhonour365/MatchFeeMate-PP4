@@ -27,6 +27,31 @@ Development was managed using GitHub Projects with a Kanban workflow. User stori
 
 - [GitHub Project Board](https://github.com/users/Yourhonour365/projects/5/views/1)
 
+## Data Model
+
+The database schema was designed to support multi-tenancy (multiple clubs) with role-based access control.
+
+![Entity Relationship Diagram](docs/readme/erd.png)
+
+### Models
+
+| Model | Purpose |
+|-------|---------|
+| **User** | Django allauth user for authentication |
+| **Club** | The cricket club - central entity all other models relate to |
+| **Player** | Club members with role-based permissions (Player/Captain/Admin) |
+| **Opposition** | Teams the club plays against |
+| **Match** | Fixtures with date, venue, and fee details |
+| **MatchPlayer** | Junction table tracking player availability and team selection per match |
+
+### Relationships
+
+- A **Club** has many **Players**, **Matches**, and **Oppositions**
+- A **Player** optionally links to a **User** account for login access
+- A **Match** belongs to one **Opposition**
+- **MatchPlayer** creates a many-to-many relationship between **Match** and **Player**, storing availability status and selection state
+
+
 ## Design
 
 ### Wireframes
