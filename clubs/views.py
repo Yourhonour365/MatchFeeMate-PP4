@@ -1,4 +1,3 @@
-from re import match
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Club, Player, Opposition, Match, MatchPlayer
@@ -69,12 +68,14 @@ def club_update(request, pk):
         form = ClubForm(request.POST, instance=club)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Club updated successfully.')
+            messages.success(
+                request, 'Club updated successfully.')
             return redirect('club_update', pk=club.pk)
     else:
         # Show form pre-filled with current data
         form = ClubForm(instance=club)
-    return render(request, 'clubs/club_form.html', {'form': form, 'club': club})
+    return render(
+        request, 'clubs/club_form.html', {'form': form, 'club': club})
 
 
 @login_required
@@ -109,7 +110,8 @@ def player_create(request, club_pk):
             return redirect('player_availability', player_pk=player.pk)
     else:
         form = PlayerForm()
-    return render(request, 'clubs/player_form.html', {'form': form, 'club': club})
+    return render(
+        request, 'clubs/player_form.html', {'form': form, 'club': club})
 
 
 @login_required
@@ -220,17 +222,17 @@ def match_create(request, club_pk):
     if request.method == 'POST':
         form = MatchForm(request.POST)
         if form.is_valid():
-            match = form.save(commit=False)
-            match.club = club
+            new_match = form.save(commit=False)
+            new_match.club = club
             # Auto-fill venue if empty
-            if not match.venue or not match.venue.strip():
-                if match.is_home:
-                    match.venue = club.home_ground
+            if not new_match.venue or not new_match.venue.strip():
+                if new_match.is_home:
+                    new_match.venue = club.home_ground
                 else:
-                    match.venue = match.opposition.home_ground
-            match.save()
+                    new_match.venue = new_match.opposition.home_ground
+            new_match.save()
             messages.success(request, 'Match created successfully.')
-            return redirect('team_selection', match_pk=match.pk)
+            return redirect('team_selection', match_pk=new_match.pk)
     else:
         form = MatchForm(
             initial={'match_fee': club.default_match_fee, 'time': '13:00'})
@@ -246,10 +248,10 @@ def match_create(request, club_pk):
 @login_required
 def match_detail(request, pk):
     """View a single match's details"""
-    match = get_object_or_404(Match, pk=pk)
+    current_match = get_object_or_404(Match, pk=pk)
 
     # Count selected and available
-    match_players = match.match_players.all()
+    match_players = current_match.match_players.all()
     selected_count = match_players.filter(selected=True).count()
     available_count = match_players.filter(
         availability='yes', selected=False).count()
@@ -259,15 +261,16 @@ def match_detail(request, pk):
         selected=True).exclude(availability='yes')
 
     # Permission check
-    is_admin_or_captain = match.club.is_admin_or_captain(request.user)
+    is_admin_or_captain = current_match.club.is_admin_or_captain(request.user)
 
     # Players who haven't responded yet
     responded_player_ids = match_players.values_list('player_id', flat=True)
     not_responded = Player.objects.filter(
-        club=match.club, is_active=True).exclude(id__in=responded_player_ids)
+        club=current_match.club, is_active=True
+    ).exclude(id__in=responded_player_ids)
 
     return render(request, 'clubs/match_detail.html', {
-        'match': match,
+        'match': current_match,
         'selected_count': selected_count,
         'available_count': available_count,
         'unavailable_selected': unavailable_selected,
@@ -279,54 +282,56 @@ def match_detail(request, pk):
 @login_required
 def match_update(request, pk):
     """Edit an existing match"""
-    match = get_object_or_404(Match, pk=pk)
+    current_match = get_object_or_404(Match, pk=pk)
     # Permission check - only admin/captain can edit matches
-    if not match.club.is_admin_or_captain(request.user):
+    if not current_match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
     if request.method == 'POST':
-        form = MatchForm(request.POST, instance=match)
+        form = MatchForm(request.POST, instance=current_match)
         if form.is_valid():
             form.save()
             messages.success(request, 'Match updated successfully.')
-            return redirect('match_update', pk=match.pk)
+            return redirect('match_update', pk=current_match.pk)
     else:
-        form = MatchForm(instance=match)
+        form = MatchForm(instance=current_match)
         # Only show opposition teams for this club
         form.fields['opposition'].queryset = Opposition.objects.filter(
-            club=match.club)
+            club=current_match.club)
     return render(request, 'clubs/match_form.html', {
         'form': form,
-        'match': match,
-        'club': match.club
+        'match': current_match,
+        'club': current_match.club
     })
 
 
 @login_required
 def match_delete(request, pk):
     """Delete a match"""
-    match = get_object_or_404(Match, pk=pk)
+    current_match = get_object_or_404(Match, pk=pk)
     # Permission check - only admin/captain can delete matches
-    if not match.club.is_admin_or_captain(request.user):
+    if not current_match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
-    club_pk = match.club.pk
+    club_pk = current_match.club.pk
     if request.method == 'POST':
-        match.delete()
+        current_match.delete()
         return redirect('club_detail', pk=club_pk)
-    return render(request, 'clubs/match_confirm_delete.html', {'match': match})
+    return render(
+        request, 'clubs/match_confirm_delete.html', {'match': current_match})
 
 
 @login_required
 def set_availability(request, match_pk, availability):
     """Set player's availability for a match"""
-    match = get_object_or_404(Match, pk=match_pk)
+    current_match = get_object_or_404(Match, pk=match_pk)
     # Find player record for this user in this club
-    player = Player.objects.filter(club=match.club, user=request.user).first()
+    player = Player.objects.filter(
+        club=current_match.club, user=request.user).first()
     if not player:
         raise PermissionDenied
 
     # Create or update availability
     match_player, created = MatchPlayer.objects.get_or_create(
-        match=match,
+        match=current_match,
         player=player,
         defaults={'availability': availability}
     )
@@ -344,16 +349,16 @@ def set_availability(request, match_pk, availability):
 @login_required
 def team_selection(request, match_pk):
     """Captain selects players for the match"""
-    match = get_object_or_404(Match, pk=match_pk)
+    current_match = get_object_or_404(Match, pk=match_pk)
     # Permission check - only admin/captain can select team
-    if not match.club.is_admin_or_captain(request.user):
+    if not current_match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
 
     # Get current user's player record
     current_player = Player.objects.filter(user=request.user).first()
 
     # Get all players and their availability for this match
-    players = Player.objects.filter(club=match.club, is_active=True)
+    players = Player.objects.filter(club=current_match.club, is_active=True)
 
     # Split players into categories
     selected_players = []
@@ -363,7 +368,7 @@ def team_selection(request, match_pk):
     unavailable_players = []
 
     for player in players:
-        mp = match.match_players.filter(player=player).first()
+        mp = current_match.match_players.filter(player=player).first()
         player.is_selected = mp.selected if mp else False
         player.availability = mp.availability if mp else None
         player.is_current_user = (player == current_player)
@@ -379,7 +384,8 @@ def team_selection(request, match_pk):
         else:
             unavailable_players.append(player)
 
-    # Sort selected players: available first, then maybe, then awaiting, then unavailable
+    # Sort selected players: available first, then maybe,
+    # then awaiting, then unavailable
     def selection_sort_key(p):
         if p.availability == 'yes':
             return (0, p.name.lower())
@@ -411,7 +417,7 @@ def team_selection(request, match_pk):
         if action == 'set_available':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'yes'}
                 )
@@ -426,7 +432,7 @@ def team_selection(request, match_pk):
         elif action == 'set_maybe':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'maybe'}
                 )
@@ -441,7 +447,7 @@ def team_selection(request, match_pk):
         elif action == 'set_unavailable':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'no'}
                 )
@@ -456,7 +462,7 @@ def team_selection(request, match_pk):
         elif action == 'add_to_team':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': None}
                 )
@@ -471,7 +477,7 @@ def team_selection(request, match_pk):
         elif action == 'remove_from_team':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': None}
                 )
@@ -491,7 +497,7 @@ def team_selection(request, match_pk):
         [p for p in selected_players if p.availability == 'yes'])
 
     return render(request, 'clubs/team_selection.html', {
-        'match': match,
+        'match': current_match,
         'selected_players': selected_players,
         'available_players': available_players,
         'maybe_players': maybe_players,
@@ -506,17 +512,17 @@ def team_selection(request, match_pk):
 @login_required
 def bulk_availability(request, match_pk):
     """View/manage availability for all players for a match"""
-    match = get_object_or_404(Match, pk=match_pk)
+    current_match = get_object_or_404(Match, pk=match_pk)
 
     # Permission check - only admin/captain can manage availability
-    if not match.club.is_admin_or_captain(request.user):
+    if not current_match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
 
     # Get current user's player record
     current_player = Player.objects.filter(user=request.user).first()
 
     # Get all players and their availability for this match
-    players = Player.objects.filter(club=match.club, is_active=True)
+    players = Player.objects.filter(club=current_match.club, is_active=True)
 
     # Split players into categories by availability only (not selection)
     available_players = []
@@ -526,7 +532,7 @@ def bulk_availability(request, match_pk):
     selected_count = 0
 
     for player in players:
-        mp = match.match_players.filter(player=player).first()
+        mp = current_match.match_players.filter(player=player).first()
         player.is_selected = mp.selected if mp else False
         player.availability = mp.availability if mp else None
         player.is_current_user = (player == current_player)
@@ -561,7 +567,7 @@ def bulk_availability(request, match_pk):
         if action == 'set_available':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'yes'}
                 )
@@ -576,7 +582,7 @@ def bulk_availability(request, match_pk):
         elif action == 'set_maybe':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'maybe'}
                 )
@@ -591,7 +597,7 @@ def bulk_availability(request, match_pk):
         elif action == 'set_unavailable':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': 'no'}
                 )
@@ -606,7 +612,7 @@ def bulk_availability(request, match_pk):
         elif action == 'add_to_team':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': None}
                 )
@@ -621,7 +627,7 @@ def bulk_availability(request, match_pk):
         elif action == 'remove_from_team':
             for player_id in selected_ids:
                 match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
+                    match=current_match,
                     player_id=player_id,
                     defaults={'availability': None}
                 )
@@ -641,7 +647,8 @@ def bulk_availability(request, match_pk):
     selectable_count = len(available_players) - in_team_count
     maybe_in_team = len([p for p in maybe_players if p.is_selected])
     awaiting_in_team = len([p for p in awaiting_players if p.is_selected])
-    unavailable_in_team = len([p for p in unavailable_players if p.is_selected])
+    unavailable_in_team = len(
+        [p for p in unavailable_players if p.is_selected])
 
     # Calculate selectable counts (not in team)
     maybe_selectable = len(maybe_players) - maybe_in_team
@@ -649,7 +656,7 @@ def bulk_availability(request, match_pk):
     unavailable_selectable = len(unavailable_players) - unavailable_in_team
 
     return render(request, 'clubs/bulk_availability.html', {
-        'match': match,
+        'match': current_match,
         'available_players': available_players,
         'maybe_players': maybe_players,
         'awaiting_players': awaiting_players,
@@ -686,14 +693,16 @@ def match_list(request):
     ).order_by('status_order', 'date')
 
     # Get current user's availability and selection status for each match
-    for match in matches:
-        mp = MatchPlayer.objects.filter(match=match, player=player).first()
-        match.my_availability = mp.availability if mp else None
-        match.is_selected = mp.selected if mp else False
-        match.selected_count = match.match_players.filter(selected=True).count()
-        match.available_count = match.match_players.filter(
+    for current_match in matches:
+        mp = MatchPlayer.objects.filter(
+            match=current_match, player=player).first()
+        current_match.my_availability = mp.availability if mp else None
+        current_match.is_selected = mp.selected if mp else False
+        current_match.selected_count = current_match.match_players.filter(
+            selected=True).count()
+        current_match.available_count = current_match.match_players.filter(
             availability='yes', selected=False).count()
-        match.maybe_count = match.match_players.filter(
+        current_match.maybe_count = current_match.match_players.filter(
             availability='maybe', selected=False).count()
 
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
@@ -739,12 +748,13 @@ def my_availability(request):
     ).order_by('status_order', 'date')
 
     # Get current availability and selected count for each match
-    for match in matches:
-        mp = MatchPlayer.objects.filter(match=match, player=player).first()
-        match.my_availability = mp.availability if mp else None
-        match.is_selected = mp.selected if mp else False
-        match.selected_count = MatchPlayer.objects.filter(
-            match=match, selected=True).count()
+    for current_match in matches:
+        mp = MatchPlayer.objects.filter(
+            match=current_match, player=player).first()
+        current_match.my_availability = mp.availability if mp else None
+        current_match.is_selected = mp.selected if mp else False
+        current_match.selected_count = MatchPlayer.objects.filter(
+            match=current_match, selected=True).count()
 
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
@@ -752,9 +762,9 @@ def my_availability(request):
         team_action = request.POST.get('team_action')
 
         for match_id in match_ids:
-            match = Match.objects.get(pk=match_id)
+            target_match = Match.objects.get(pk=match_id)
             mp, created = MatchPlayer.objects.get_or_create(
-                match=match,
+                match=target_match,
                 player=player,
                 defaults={'availability': 'maybe'}
             )
@@ -809,12 +819,13 @@ def player_availability(request, player_pk):
     ).order_by('status_order', 'date')
 
     # Get current availability for each match
-    for match in matches:
-        mp = MatchPlayer.objects.filter(match=match, player=player).first()
-        match.my_availability = mp.availability if mp else None
-        match.is_selected = mp.selected if mp else False
-        match.selected_count = MatchPlayer.objects.filter(
-            match=match, selected=True).count()
+    for current_match in matches:
+        mp = MatchPlayer.objects.filter(
+            match=current_match, player=player).first()
+        current_match.my_availability = mp.availability if mp else None
+        current_match.is_selected = mp.selected if mp else False
+        current_match.selected_count = MatchPlayer.objects.filter(
+            match=current_match, selected=True).count()
 
     if request.method == 'POST':
         match_ids = request.POST.getlist('matches')
@@ -822,9 +833,9 @@ def player_availability(request, player_pk):
         team_action = request.POST.get('team_action')
 
         for match_id in match_ids:
-            match = Match.objects.get(pk=match_id)
+            target_match = Match.objects.get(pk=match_id)
             mp, created = MatchPlayer.objects.get_or_create(
-                match=match,
+                match=target_match,
                 player=player,
                 defaults={'availability': 'maybe'}
             )
