@@ -30,7 +30,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button card-header-available py-2{% if open_accordion != 'availablePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#availablePlayers" aria-expanded="{% if open_accordion == 'availablePlayers' %}true{% else %}false{% endif %}">
-                    <strong>Available: {{ selectable_count }}</strong>&nbsp;<span class="available-calc">({{ available_players|length }} − {{ in_team_count }} in team)</span>
+                    <strong>Available: {{ selectable_count }}</strong>&nbsp;<span class="text-muted small">({{ available_players|length }} − {{ in_team_count }} in team)</span>
                 </button>
             </h2>
             <div id="availablePlayers" class="accordion-collapse collapse{% if open_accordion == 'availablePlayers' %} show{% endif %}" data-bs-parent="#availabilityAccordion">
@@ -58,7 +58,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button card-header-maybe py-2{% if open_accordion != 'maybePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#maybePlayers" aria-expanded="{% if open_accordion == 'maybePlayers' %}true{% else %}false{% endif %}">
-                    <strong>Maybe ({{ maybe_players|length }})</strong>
+                    <strong>Maybe: {{ maybe_selectable }}</strong>&nbsp;<span class="text-muted small">({{ maybe_players|length }} − {{ maybe_in_team }} in team)</span>
                 </button>
             </h2>
             <div id="maybePlayers" class="accordion-collapse collapse{% if open_accordion == 'maybePlayers' %} show{% endif %}" data-bs-parent="#availabilityAccordion">
@@ -86,7 +86,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button bg-secondary-subtle text-dark py-2{% if open_accordion != 'awaitingPlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#awaitingPlayers" aria-expanded="{% if open_accordion == 'awaitingPlayers' %}true{% else %}false{% endif %}">
-                    <strong>Awaiting Response ({{ awaiting_players|length }})</strong>
+                    <strong>Awaiting Response: {{ awaiting_selectable }}</strong>&nbsp;<span class="text-muted small">({{ awaiting_players|length }} − {{ awaiting_in_team }} in team)</span>
                 </button>
             </h2>
             <div id="awaitingPlayers" class="accordion-collapse collapse{% if open_accordion == 'awaitingPlayers' %} show{% endif %}" data-bs-parent="#availabilityAccordion">
@@ -114,7 +114,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button bg-danger-subtle text-dark py-2{% if open_accordion != 'unavailablePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#unavailablePlayers" aria-expanded="{% if open_accordion == 'unavailablePlayers' %}true{% else %}false{% endif %}">
-                    <strong>Unavailable ({{ unavailable_players|length }})</strong>
+                    <strong>Unavailable: {{ unavailable_selectable }}</strong>&nbsp;<span class="text-muted small">({{ unavailable_players|length }} − {{ unavailable_in_team }} in team)</span>
                 </button>
             </h2>
             <div id="unavailablePlayers" class="accordion-collapse collapse{% if open_accordion == 'unavailablePlayers' %} show{% endif %}" data-bs-parent="#availabilityAccordion">

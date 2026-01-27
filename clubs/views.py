@@ -126,7 +126,11 @@ def player_update(request, pk):
             return redirect('club_detail', pk=player.club.pk)
     else:
         form = PlayerForm(instance=player)
-    return render(request, 'clubs/player_form.html', {'form': form, 'player': player, 'club': player.club})
+    return render(request, 'clubs/player_form.html', {
+        'form': form,
+        'player': player,
+        'club': player.club
+    })
 
 
 @login_required
@@ -140,7 +144,9 @@ def player_delete(request, pk):
     if request.method == 'POST':
         player.delete()
         return redirect('club_detail', pk=club_pk)
-    return render(request, 'clubs/player_confirm_delete.html', {'player': player})
+    return render(request, 'clubs/player_confirm_delete.html', {
+        'player': player
+    })
 
 
 @login_required
@@ -160,7 +166,10 @@ def opposition_create(request, club_pk):
             return redirect('opposition_create', club_pk=club.pk)
     else:
         form = OppositionForm()
-    return render(request, 'clubs/opposition_form.html', {'form': form, 'club': club})
+    return render(request, 'clubs/opposition_form.html', {
+        'form': form,
+        'club': club
+    })
 
 
 @login_required
@@ -178,10 +187,11 @@ def opposition_update(request, pk):
             return redirect('opposition_update', pk=opposition.pk)
     else:
         form = OppositionForm(instance=opposition)
-    return render(
-        request, 'clubs/opposition_form.html',
-        {'form': form, 'opposition': opposition, 'club': opposition.club}
-    )
+    return render(request, 'clubs/opposition_form.html', {
+        'form': form,
+        'opposition': opposition,
+        'club': opposition.club
+    })
 
 
 @login_required
@@ -195,7 +205,9 @@ def opposition_delete(request, pk):
     if request.method == 'POST':
         opposition.delete()
         return redirect('club_detail', pk=club_pk)
-    return render(request, 'clubs/opposition_confirm_delete.html', {'opposition': opposition})
+    return render(request, 'clubs/opposition_confirm_delete.html', {
+        'opposition': opposition
+    })
 
 
 @login_required
@@ -225,7 +237,10 @@ def match_create(request, club_pk):
         # Only show opposition teams for this club
         form.fields['opposition'].queryset = Opposition.objects.filter(
             club=club)
-    return render(request, 'clubs/match_form.html', {'form': form, 'club': club})
+    return render(request, 'clubs/match_form.html', {
+        'form': form,
+        'club': club
+    })
 
 
 @login_required
@@ -279,7 +294,11 @@ def match_update(request, pk):
         # Only show opposition teams for this club
         form.fields['opposition'].queryset = Opposition.objects.filter(
             club=match.club)
-    return render(request, 'clubs/match_form.html', {'form': form, 'match': match, 'club': match.club})
+    return render(request, 'clubs/match_form.html', {
+        'form': form,
+        'match': match,
+        'club': match.club
+    })
 
 
 @login_required
@@ -360,6 +379,25 @@ def team_selection(request, match_pk):
         else:
             unavailable_players.append(player)
 
+    # Sort selected players: available first, then maybe, then awaiting, then unavailable
+    def selection_sort_key(p):
+        if p.availability == 'yes':
+            return (0, p.name.lower())
+        elif p.availability == 'maybe':
+            return (1, p.name.lower())
+        elif p.availability is None:
+            return (2, p.name.lower())
+        else:
+            return (3, p.name.lower())
+
+    selected_players.sort(key=selection_sort_key)
+
+    # Sort other lists alphabetically
+    available_players.sort(key=lambda p: p.name.lower())
+    maybe_players.sort(key=lambda p: p.name.lower())
+    awaiting_players.sort(key=lambda p: p.name.lower())
+    unavailable_players.sort(key=lambda p: p.name.lower())
+
     # Warning: selected but not available
     unavailable_selected = [
         p for p in selected_players if p.availability != 'yes']
@@ -367,7 +405,8 @@ def team_selection(request, match_pk):
     if request.method == 'POST':
         action = request.POST.get('action')
         selected_ids = request.POST.getlist('selected')
-        current_accordion = request.POST.get('current_accordion', 'selectedPlayers')
+        current_accordion = request.POST.get(
+            'current_accordion', 'selectedPlayers')
 
         if action == 'set_available':
             for player_id in selected_ids:
@@ -378,8 +417,11 @@ def team_selection(request, match_pk):
                 )
                 match_player.availability = 'yes'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
-            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Available.')
+            return redirect(
+                f"{reverse('team_selection', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'set_maybe':
             for player_id in selected_ids:
@@ -390,8 +432,11 @@ def team_selection(request, match_pk):
                 )
                 match_player.availability = 'maybe'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
-            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Maybe.')
+            return redirect(
+                f"{reverse('team_selection', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'set_unavailable':
             for player_id in selected_ids:
@@ -402,8 +447,11 @@ def team_selection(request, match_pk):
                 )
                 match_player.availability = 'no'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
-            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Unavailable.')
+            return redirect(
+                f"{reverse('team_selection', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'add_to_team':
             for player_id in selected_ids:
@@ -414,8 +462,11 @@ def team_selection(request, match_pk):
                 )
                 match_player.selected = True
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
-            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) added to team.')
+            return redirect(
+                f"{reverse('team_selection', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'remove_from_team':
             for player_id in selected_ids:
@@ -426,14 +477,18 @@ def team_selection(request, match_pk):
                 )
                 match_player.selected = False
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
-            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) removed from team.')
+            return redirect(
+                f"{reverse('team_selection', args=[match_pk])}"
+                f"?open={current_accordion}")
 
     # Get which accordion to open from URL param
     open_accordion = request.GET.get('open', 'selectedPlayers')
 
     # Count total available (selected + not selected but available)
-    total_available = len(available_players) + len([p for p in selected_players if p.availability == 'yes'])
+    total_available = len(available_players) + len(
+        [p for p in selected_players if p.availability == 'yes'])
 
     return render(request, 'clubs/team_selection.html', {
         'match': match,
@@ -488,10 +543,20 @@ def bulk_availability(request, match_pk):
         else:
             unavailable_players.append(player)
 
+    # Sort each list: in-team first, then alphabetically
+    def in_team_sort_key(p):
+        return (0 if p.is_selected else 1, p.name.lower())
+
+    available_players.sort(key=in_team_sort_key)
+    maybe_players.sort(key=in_team_sort_key)
+    awaiting_players.sort(key=in_team_sort_key)
+    unavailable_players.sort(key=in_team_sort_key)
+
     if request.method == 'POST':
         action = request.POST.get('action')
         selected_ids = request.POST.getlist('selected')
-        current_accordion = request.POST.get('current_accordion', 'availablePlayers')
+        current_accordion = request.POST.get(
+            'current_accordion', 'availablePlayers')
 
         if action == 'set_available':
             for player_id in selected_ids:
@@ -502,8 +567,11 @@ def bulk_availability(request, match_pk):
                 )
                 match_player.availability = 'yes'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Available.')
+            return redirect(
+                f"{reverse('bulk_availability', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'set_maybe':
             for player_id in selected_ids:
@@ -514,8 +582,11 @@ def bulk_availability(request, match_pk):
                 )
                 match_player.availability = 'maybe'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Maybe.')
+            return redirect(
+                f"{reverse('bulk_availability', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'set_unavailable':
             for player_id in selected_ids:
@@ -526,8 +597,11 @@ def bulk_availability(request, match_pk):
                 )
                 match_player.availability = 'no'
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) set to Unavailable.')
+            return redirect(
+                f"{reverse('bulk_availability', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'add_to_team':
             for player_id in selected_ids:
@@ -538,8 +612,11 @@ def bulk_availability(request, match_pk):
                 )
                 match_player.selected = True
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) added to team.')
+            return redirect(
+                f"{reverse('bulk_availability', args=[match_pk])}"
+                f"?open={current_accordion}")
 
         elif action == 'remove_from_team':
             for player_id in selected_ids:
@@ -550,14 +627,26 @@ def bulk_availability(request, match_pk):
                 )
                 match_player.selected = False
                 match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+            messages.success(
+                request, f'{len(selected_ids)} player(s) removed from team.')
+            return redirect(
+                f"{reverse('bulk_availability', args=[match_pk])}"
+                f"?open={current_accordion}")
 
     # Get which accordion to open from URL param
     open_accordion = request.GET.get('open', 'availablePlayers')
 
-    # Count selectable (available but not in team)
-    selectable_count = len([p for p in available_players if not p.is_selected])
+    # Count how many in each category are already in team
+    in_team_count = len([p for p in available_players if p.is_selected])
+    selectable_count = len(available_players) - in_team_count
+    maybe_in_team = len([p for p in maybe_players if p.is_selected])
+    awaiting_in_team = len([p for p in awaiting_players if p.is_selected])
+    unavailable_in_team = len([p for p in unavailable_players if p.is_selected])
+
+    # Calculate selectable counts (not in team)
+    maybe_selectable = len(maybe_players) - maybe_in_team
+    awaiting_selectable = len(awaiting_players) - awaiting_in_team
+    unavailable_selectable = len(unavailable_players) - unavailable_in_team
 
     return render(request, 'clubs/bulk_availability.html', {
         'match': match,
@@ -567,6 +656,13 @@ def bulk_availability(request, match_pk):
         'unavailable_players': unavailable_players,
         'selected_count': selected_count,
         'selectable_count': selectable_count,
+        'in_team_count': in_team_count,
+        'maybe_in_team': maybe_in_team,
+        'awaiting_in_team': awaiting_in_team,
+        'unavailable_in_team': unavailable_in_team,
+        'maybe_selectable': maybe_selectable,
+        'awaiting_selectable': awaiting_selectable,
+        'unavailable_selectable': unavailable_selectable,
         'open_accordion': open_accordion,
     })
 
@@ -595,8 +691,10 @@ def match_list(request):
         match.my_availability = mp.availability if mp else None
         match.is_selected = mp.selected if mp else False
         match.selected_count = match.match_players.filter(selected=True).count()
-        match.available_count = match.match_players.filter(availability='yes', selected=False).count()
-        match.maybe_count = match.match_players.filter(availability='maybe', selected=False).count()
+        match.available_count = match.match_players.filter(
+            availability='yes', selected=False).count()
+        match.maybe_count = match.match_players.filter(
+            availability='maybe', selected=False).count()
 
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
@@ -689,130 +787,6 @@ def my_availability(request):
         'is_admin_or_captain': is_admin_or_captain,
     })
 
-
-@login_required
-def bulk_availability(request, match_pk):
-    """View/manage availability for all players for a match"""
-    match = get_object_or_404(Match, pk=match_pk)
-
-    # Permission check - only admin/captain can manage availability
-    if not match.club.is_admin_or_captain(request.user):
-        raise PermissionDenied
-
-    # Get current user's player record
-    current_player = Player.objects.filter(user=request.user).first()
-
-    # Get all players and their availability for this match
-    players = Player.objects.filter(club=match.club, is_active=True)
-
-    # Split players into categories by availability only (not selection)
-    available_players = []
-    maybe_players = []
-    awaiting_players = []
-    unavailable_players = []
-    selected_count = 0
-
-    for player in players:
-        mp = match.match_players.filter(player=player).first()
-        player.is_selected = mp.selected if mp else False
-        player.availability = mp.availability if mp else None
-        player.is_current_user = (player == current_player)
-
-        if player.is_selected:
-            selected_count += 1
-
-        if player.availability == 'yes':
-            available_players.append(player)
-        elif player.availability == 'maybe':
-            maybe_players.append(player)
-        elif player.availability is None:
-            awaiting_players.append(player)
-        else:
-            unavailable_players.append(player)
-
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        selected_ids = request.POST.getlist('selected')
-        current_accordion = request.POST.get('current_accordion', 'availablePlayers')
-
-        if action == 'set_available':
-            for player_id in selected_ids:
-                match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
-                    player_id=player_id,
-                    defaults={'availability': 'yes'}
-                )
-                match_player.availability = 'yes'
-                match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
-
-        elif action == 'set_maybe':
-            for player_id in selected_ids:
-                match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
-                    player_id=player_id,
-                    defaults={'availability': 'maybe'}
-                )
-                match_player.availability = 'maybe'
-                match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
-
-        elif action == 'set_unavailable':
-            for player_id in selected_ids:
-                match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
-                    player_id=player_id,
-                    defaults={'availability': 'no'}
-                )
-                match_player.availability = 'no'
-                match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
-
-        elif action == 'add_to_team':
-            for player_id in selected_ids:
-                match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
-                    player_id=player_id,
-                    defaults={'availability': None}
-                )
-                match_player.selected = True
-                match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
-
-        elif action == 'remove_from_team':
-            for player_id in selected_ids:
-                match_player, created = MatchPlayer.objects.get_or_create(
-                    match=match,
-                    player_id=player_id,
-                    defaults={'availability': None}
-                )
-                match_player.selected = False
-                match_player.save()
-            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
-            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
-
-    # Get which accordion to open from URL param
-    open_accordion = request.GET.get('open', 'availablePlayers')
-
-    # Count how many available players are already in team
-    in_team_count = len([p for p in available_players if p.is_selected])
-    selectable_count = len(available_players) - in_team_count
-
-    return render(request, 'clubs/bulk_availability.html', {
-        'match': match,
-        'available_players': available_players,
-        'maybe_players': maybe_players,
-        'awaiting_players': awaiting_players,
-        'unavailable_players': unavailable_players,
-        'selected_count': selected_count,
-        'selectable_count': selectable_count,
-        'in_team_count': in_team_count,
-        'open_accordion': open_accordion,
-    })
 
 @login_required
 def player_availability(request, player_pk):

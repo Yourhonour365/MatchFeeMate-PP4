@@ -32,8 +32,7 @@
                         {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %}{% if match.is_selected %}, Selected{% endif %}
                     </span>
                     <span class="text-muted">·</span>
-                    <a href="{% url 'team_selection' match_pk=match.pk %}" class="text-decoration-underline" style="color: #00008b;">Team:</a>
-                    <span class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11{% if match.selected_count >= 11 %} Full{% endif %}</span>
+                    Team: <a href="{% url 'team_selection' match_pk=match.pk %}" class="{% if match.selected_count >= 11 %}text-success{% else %}text-warning{% endif %}">{{ match.selected_count }}/11{% if match.selected_count >= 11 %} Full{% endif %}</a>
                 </div>
             </div>
         </div>
