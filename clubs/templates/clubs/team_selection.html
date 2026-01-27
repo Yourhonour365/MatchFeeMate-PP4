@@ -18,28 +18,36 @@
     </div>
 </div>
 
+<!-- Helper text -->
+<p class="small text-muted mb-2">Tick players then use buttons below to update selection or availability.</p>
+
 <form method="post">
     {% csrf_token %}
+    <input type="hidden" name="current_accordion" id="currentAccordion" value="{{ open_accordion }}">
     
     <div class="accordion" id="selectionAccordion">
         <!-- Currently selected players -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button card-header-selected py-2" type="button" data-bs-toggle="collapse" data-bs-target="#selectedPlayers" aria-expanded="true">
+                <button class="accordion-button card-header-selected py-2{% if open_accordion != 'selectedPlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#selectedPlayers" aria-expanded="{% if open_accordion == 'selectedPlayers' %}true{% else %}false{% endif %}">
                     <strong>Selected ({{ selected_players|length }})</strong>{% if selected_players|length >= 11 %}&nbsp;<em class="text-success">Full</em>{% endif %}
                 </button>
             </h2>
-            <div id="selectedPlayers" class="accordion-collapse collapse show" data-bs-parent="#selectionAccordion">
+            <div id="selectedPlayers" class="accordion-collapse collapse{% if open_accordion == 'selectedPlayers' %} show{% endif %}" data-bs-parent="#selectionAccordion">
                 <div class="accordion-body py-2">
+                    <div class="d-flex gap-2 mt-2 mb-2">
+                        <span class="btn btn-outline-success btn-sm all-clear-btn" data-section="selectedPlayers" data-action="all">All</span>
+                        <span class="btn btn-outline-secondary btn-sm all-clear-btn" data-section="selectedPlayers" data-action="clear">Clear</span>
+                    </div>
                     {% for player in selected_players %}
-                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                        <div>
-                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}" checked>
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
-                        </div>
-                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline {% if player.availability == 'yes' %}text-success{% elif player.availability == 'maybe' %}text-warning{% elif player.availability is None %}text-muted{% else %}text-danger{% endif %}">
-                            {% if player.availability == 'yes' %}Available{% elif player.availability == 'maybe' %}Maybe{% elif player.availability is None %}Awaiting{% else %}Unavailable{% endif %}
-                        </a>
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} player-row">
+                        <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="sel_{{ player.pk }}">
+                        <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="sel_{{ player.pk }}">
+                            {{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                            <a href="{% url 'player_availability' player_pk=player.pk %}" class="availability-link text-decoration-underline ms-1 {% if player.availability == 'yes' %}text-success{% elif player.availability == 'maybe' %}text-warning{% elif player.availability is None %}text-muted{% else %}text-danger{% endif %}">
+                                {% if player.availability == 'yes' %}Available{% elif player.availability == 'maybe' %}Maybe{% elif player.availability is None %}Awaiting{% else %}Unavailable{% endif %}
+                            </a>
+                        </label>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players selected yet.</p>
@@ -51,19 +59,23 @@
         <!-- Available players -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed card-header-available py-2" type="button" data-bs-toggle="collapse" data-bs-target="#availablePlayers" aria-expanded="false">
+                <button class="accordion-button card-header-available py-2{% if open_accordion != 'availablePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#availablePlayers" aria-expanded="{% if open_accordion == 'availablePlayers' %}true{% else %}false{% endif %}">
                     <strong>Available ({{ available_players|length }})</strong>
                 </button>
             </h2>
-            <div id="availablePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+            <div id="availablePlayers" class="accordion-collapse collapse{% if open_accordion == 'availablePlayers' %} show{% endif %}" data-bs-parent="#selectionAccordion">
                 <div class="accordion-body py-2">
+                    <div class="d-flex gap-2 mt-2 mb-2">
+                        <span class="btn btn-outline-success btn-sm all-clear-btn" data-section="availablePlayers" data-action="all">All</span>
+                        <span class="btn btn-outline-secondary btn-sm all-clear-btn" data-section="availablePlayers" data-action="clear">Clear</span>
+                    </div>
                     {% for player in available_players %}
-                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                        <div>
-                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
-                        </div>
-                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-success">Available</a>
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} player-row">
+                        <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="avail_{{ player.pk }}">
+                        <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="avail_{{ player.pk }}">
+                            {{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                            <span class="availability-link ms-1 text-success">Available</span>
+                        </label>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players available.</p>
@@ -75,19 +87,23 @@
         <!-- Maybe players -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed card-header-maybe py-2" type="button" data-bs-toggle="collapse" data-bs-target="#maybePlayers" aria-expanded="false">
+                <button class="accordion-button card-header-maybe py-2{% if open_accordion != 'maybePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#maybePlayers" aria-expanded="{% if open_accordion == 'maybePlayers' %}true{% else %}false{% endif %}">
                     <strong>Maybe ({{ maybe_players|length }})</strong>
                 </button>
             </h2>
-            <div id="maybePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+            <div id="maybePlayers" class="accordion-collapse collapse{% if open_accordion == 'maybePlayers' %} show{% endif %}" data-bs-parent="#selectionAccordion">
                 <div class="accordion-body py-2">
+                    <div class="d-flex gap-2 mt-2 mb-2">
+                        <span class="btn btn-outline-success btn-sm all-clear-btn" data-section="maybePlayers" data-action="all">All</span>
+                        <span class="btn btn-outline-secondary btn-sm all-clear-btn" data-section="maybePlayers" data-action="clear">Clear</span>
+                    </div>
                     {% for player in maybe_players %}
-                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                        <div>
-                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
-                        </div>
-                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-warning">Maybe</a>
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} player-row">
+                        <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="maybe_{{ player.pk }}">
+                        <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="maybe_{{ player.pk }}">
+                            {{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                            <span class="availability-link ms-1 text-warning">Maybe</span>
+                        </label>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players with maybe status.</p>
@@ -99,19 +115,23 @@
         <!-- Awaiting response -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed bg-secondary-subtle text-dark py-2" type="button" data-bs-toggle="collapse" data-bs-target="#awaitingPlayers" aria-expanded="false">
+                <button class="accordion-button bg-secondary-subtle text-dark py-2{% if open_accordion != 'awaitingPlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#awaitingPlayers" aria-expanded="{% if open_accordion == 'awaitingPlayers' %}true{% else %}false{% endif %}">
                     <strong>Awaiting Response ({{ awaiting_players|length }})</strong>
                 </button>
             </h2>
-            <div id="awaitingPlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+            <div id="awaitingPlayers" class="accordion-collapse collapse{% if open_accordion == 'awaitingPlayers' %} show{% endif %}" data-bs-parent="#selectionAccordion">
                 <div class="accordion-body py-2">
+                    <div class="d-flex gap-2 mt-2 mb-2">
+                        <span class="btn btn-outline-success btn-sm all-clear-btn" data-section="awaitingPlayers" data-action="all">All</span>
+                        <span class="btn btn-outline-secondary btn-sm all-clear-btn" data-section="awaitingPlayers" data-action="clear">Clear</span>
+                    </div>
                     {% for player in awaiting_players %}
-                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                        <div>
-                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="awaiting_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="awaiting_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
-                        </div>
-                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-muted">Awaiting</a>
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} player-row">
+                        <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="awaiting_{{ player.pk }}">
+                        <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="awaiting_{{ player.pk }}">
+                            {{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                            <span class="availability-link ms-1 text-muted">Awaiting</span>
+                        </label>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players awaiting response.</p>
@@ -123,19 +143,23 @@
         <!-- Unavailable players -->
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed bg-danger-subtle text-dark py-2" type="button" data-bs-toggle="collapse" data-bs-target="#unavailablePlayers" aria-expanded="false">
+                <button class="accordion-button bg-danger-subtle text-dark py-2{% if open_accordion != 'unavailablePlayers' %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#unavailablePlayers" aria-expanded="{% if open_accordion == 'unavailablePlayers' %}true{% else %}false{% endif %}">
                     <strong>Unavailable ({{ unavailable_players|length }})</strong>
                 </button>
             </h2>
-            <div id="unavailablePlayers" class="accordion-collapse collapse" data-bs-parent="#selectionAccordion">
+            <div id="unavailablePlayers" class="accordion-collapse collapse{% if open_accordion == 'unavailablePlayers' %} show{% endif %}" data-bs-parent="#selectionAccordion">
                 <div class="accordion-body py-2">
+                    <div class="d-flex gap-2 mt-2 mb-2">
+                        <span class="btn btn-outline-success btn-sm all-clear-btn" data-section="unavailablePlayers" data-action="all">All</span>
+                        <span class="btn btn-outline-secondary btn-sm all-clear-btn" data-section="unavailablePlayers" data-action="clear">Clear</span>
+                    </div>
                     {% for player in unavailable_players %}
-                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} d-flex justify-content-between align-items-center">
-                        <div>
-                            <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
-                            <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">{{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}</label>
-                        </div>
-                        <a href="{% url 'player_availability' player_pk=player.pk %}" class="small text-decoration-underline text-danger">Unavailable</a>
+                    <div class="form-check py-1 {% if not forloop.last %}border-bottom{% endif %} player-row">
+                        <input class="form-check-input" type="checkbox" name="selected" value="{{ player.pk }}" id="unavail_{{ player.pk }}">
+                        <label class="form-check-label {% if player.is_current_user %}fw-bold fst-italic{% endif %}" for="unavail_{{ player.pk }}">
+                            {{ player.name }}{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
+                            <span class="availability-link ms-1 text-danger">Unavailable</span>
+                        </label>
                     </div>
                     {% empty %}
                     <p class="text-muted mb-0 small">No players unavailable.</p>
@@ -146,9 +170,93 @@
     </div>
         
     <!-- Action buttons - sticky at bottom -->
-    <div class="position-sticky bottom-0 py-2 d-flex justify-content-center gap-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
-        <a href="{% url 'match_list' %}" class="btn btn-outline-secondary px-5">Exit</a>
-        <button type="submit" class="btn btn-mfm-primary px-5">Save</button>
+    <div class="position-sticky bottom-0 py-2" style="background-color: var(--mfm-cream); margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem;">
+        <!-- Availability buttons -->
+        <div class="d-flex justify-content-center gap-2 mb-2">
+            <button type="submit" name="action" value="set_available" class="btn btn-success btn-sm action-btn" disabled>Available</button>
+            <button type="submit" name="action" value="set_maybe" class="btn btn-warning btn-sm action-btn" disabled>Maybe</button>
+            <button type="submit" name="action" value="set_unavailable" class="btn btn-danger btn-sm action-btn" disabled>Unavailable</button>
+        </div>
+        <!-- Team selection buttons -->
+        <div class="d-flex justify-content-center gap-2 mb-2">
+            <button type="submit" name="action" value="add_to_team" class="btn btn-dark btn-sm action-btn" disabled>Add to Team</button>
+            <button type="submit" name="action" value="remove_from_team" class="btn btn-outline-danger btn-sm action-btn" disabled>Remove from Team</button>
+        </div>
+        <!-- Exit -->
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'match_list' %}" class="btn btn-outline-secondary btn-sm">Exit</a>
+        </div>
     </div>
 </form>
+
+<script>
+// Track which accordion is open
+document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+    collapse.addEventListener('show.bs.collapse', function() {
+        document.getElementById('currentAccordion').value = this.id;
+    });
+});
+
+// Handle All/Clear button clicks
+document.querySelectorAll('.all-clear-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const sectionId = this.dataset.section;
+        const action = this.dataset.action;
+        const section = document.getElementById(sectionId);
+        
+        if (action === 'all') {
+            section.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                cb.closest('.player-row')?.classList.add('selected');
+            });
+        } else {
+            section.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+                cb.closest('.player-row')?.classList.remove('selected');
+            });
+        }
+        
+        updateActionButtons();
+    });
+});
+
+// Update action buttons based on checkbox state
+function updateActionButtons() {
+    const anyChecked = document.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.disabled = !anyChecked;
+    });
+}
+
+// Highlight selected rows and update buttons
+document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+        if (this.checked) {
+            this.closest('.player-row')?.classList.add('selected');
+        } else {
+            this.closest('.player-row')?.classList.remove('selected');
+        }
+        updateActionButtons();
+    });
+});
+
+// Initial button state
+updateActionButtons();
+</script>
+
+<style>
+.player-row.selected {
+    background-color: rgba(25, 135, 84, 0.1);
+    border-left: 3px solid #198754;
+    margin-left: -3px;
+}
+.all-clear-btn {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+}
+.availability-link {
+    font-size: 0.75rem;
+    font-style: italic;
+}
+</style>
 {% endblock %}

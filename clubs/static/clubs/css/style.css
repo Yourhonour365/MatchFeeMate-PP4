@@ -262,3 +262,8 @@ a:hover {
     margin-left: 2px;
     font-weight: normal;
 }
+
+.availability-link {
+    font-size: 0.75rem;
+    font-style: italic;
+}

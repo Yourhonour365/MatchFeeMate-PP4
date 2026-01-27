@@ -5,7 +5,7 @@ from .models import Club, Player, Opposition, Match, MatchPlayer
 from .forms import ClubForm, PlayerForm, OppositionForm, MatchForm
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
-
+from django.urls import reverse
 
 def home(request):
     """Display the homepage - redirect to club if user has one"""
@@ -364,18 +364,72 @@ def team_selection(request, match_pk):
         p for p in selected_players if p.availability != 'yes']
 
     if request.method == 'POST':
+        action = request.POST.get('action')
         selected_ids = request.POST.getlist('selected')
-        # Update all match_players for this match
-        for player in players:
-            match_player, created = MatchPlayer.objects.get_or_create(
-                match=match,
-                player=player,
-                defaults={'availability': 'maybe'}
-            )
-            match_player.selected = str(player.pk) in selected_ids
-            match_player.save()
-        messages.success(request, 'Team selection updated successfully.')
-        return redirect('team_selection', match_pk=match_pk)
+        current_accordion = request.POST.get('current_accordion', 'selectedPlayers')
+
+        if action == 'set_available':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'yes'}
+                )
+                match_player.availability = 'yes'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
+            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'set_maybe':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'maybe'}
+                )
+                match_player.availability = 'maybe'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
+            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'set_unavailable':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'no'}
+                )
+                match_player.availability = 'no'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
+            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'add_to_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
+                match_player.selected = True
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
+            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'remove_from_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
+                match_player.selected = False
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
+            return redirect(f"{reverse('team_selection', args=[match_pk])}?open={current_accordion}")
+
+    # Get which accordion to open from URL param
+    open_accordion = request.GET.get('open', 'selectedPlayers')
 
     return render(request, 'clubs/team_selection.html', {
         'match': match,
@@ -385,6 +439,7 @@ def team_selection(request, match_pk):
         'awaiting_players': awaiting_players,
         'unavailable_players': unavailable_players,
         'unavailable_selected': unavailable_selected,
+        'open_accordion': open_accordion,
     })
 
 
