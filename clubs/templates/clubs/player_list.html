@@ -17,7 +17,7 @@
         <div class="card-body py-2 d-flex justify-content-between align-items-center">
             <div>
                 <span class="fw-medium">{{ player.name }}</span>{% if player.role != 'player' %}<sup class="admin-badge">{{ player.get_role_display }}</sup>{% endif %}
-                <a href="{% url 'player_availability' player_pk=player.pk %}" class="ms-3 text-success">Participation</a>
+                <a href="{% url 'player_availability' player_pk=player.pk %}" class="ms-3 participation-link">Participation</a>
             </div>
             {% if is_admin_or_captain %}
             <a href="{% url 'player_update' pk=player.pk %}" class="btn btn-mfm-secondary btn-sm">Edit</a>
@@ -28,4 +28,11 @@
 {% else %}
     <p class="text-muted">No players yet.</p>
 {% endif %}
+<style>
+.participation-link {
+    font-size: 0.8rem;
+    color: #00008b;
+    font-style: italic;
+}
+</style>
 {% endblock %}

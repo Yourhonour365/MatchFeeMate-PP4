@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.urls import reverse
 
+
 def home(request):
     """Display the homepage - redirect to club if user has one"""
     if request.user.is_authenticated:
@@ -431,6 +432,9 @@ def team_selection(request, match_pk):
     # Get which accordion to open from URL param
     open_accordion = request.GET.get('open', 'selectedPlayers')
 
+    # Count total available (selected + not selected but available)
+    total_available = len(available_players) + len([p for p in selected_players if p.availability == 'yes'])
+
     return render(request, 'clubs/team_selection.html', {
         'match': match,
         'selected_players': selected_players,
@@ -440,82 +444,130 @@ def team_selection(request, match_pk):
         'unavailable_players': unavailable_players,
         'unavailable_selected': unavailable_selected,
         'open_accordion': open_accordion,
+        'total_available': total_available,
     })
 
 
 @login_required
 def bulk_availability(request, match_pk):
-    """Admin updates multiple players' availability at once"""
+    """View/manage availability for all players for a match"""
     match = get_object_or_404(Match, pk=match_pk)
-    # Permission check - only admin/captain can update availability
+
+    # Permission check - only admin/captain can manage availability
     if not match.club.is_admin_or_captain(request.user):
         raise PermissionDenied
 
+    # Get current user's player record
+    current_player = Player.objects.filter(user=request.user).first()
+
+    # Get all players and their availability for this match
     players = Player.objects.filter(club=match.club, is_active=True)
 
-    # Categorize players
-    selected_players = []
+    # Split players into categories by availability only (not selection)
     available_players = []
     maybe_players = []
-    unavailable_players = []
     awaiting_players = []
+    unavailable_players = []
+    selected_count = 0
 
     for player in players:
         mp = match.match_players.filter(player=player).first()
-        player.current_availability = mp.get_availability_display() if mp else 'Awaiting response'
         player.is_selected = mp.selected if mp else False
+        player.availability = mp.availability if mp else None
+        player.is_current_user = (player == current_player)
 
         if player.is_selected:
-            selected_players.append(player)
-        elif player.current_availability == 'Available':
+            selected_count += 1
+
+        if player.availability == 'yes':
             available_players.append(player)
-        elif player.current_availability == 'Maybe':
+        elif player.availability == 'maybe':
             maybe_players.append(player)
-        elif player.current_availability == 'Awaiting response':
+        elif player.availability is None:
             awaiting_players.append(player)
         else:
             unavailable_players.append(player)
 
     if request.method == 'POST':
-        selected_ids = request.POST.getlist('players')
-        new_availability = request.POST.get('availability')
-        team_action = request.POST.get('team_action')
+        action = request.POST.get('action')
+        selected_ids = request.POST.getlist('selected')
+        current_accordion = request.POST.get('current_accordion', 'availablePlayers')
 
-        for player_id in selected_ids:
-            player = Player.objects.get(pk=player_id)
-            match_player, created = MatchPlayer.objects.get_or_create(
-                match=match,
-                player=player,
-                defaults={'availability': 'maybe'}
-            )
+        if action == 'set_available':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'yes'}
+                )
+                match_player.availability = 'yes'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
 
-            if new_availability:
-                match_player.availability = new_availability
+        elif action == 'set_maybe':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'maybe'}
+                )
+                match_player.availability = 'maybe'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
 
-            if team_action == 'add':
+        elif action == 'set_unavailable':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'no'}
+                )
+                match_player.availability = 'no'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'add_to_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
                 match_player.selected = True
-            elif team_action == 'remove':
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'remove_from_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
                 match_player.selected = False
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
 
-            match_player.save()
+    # Get which accordion to open from URL param
+    open_accordion = request.GET.get('open', 'availablePlayers')
 
-        if selected_ids:
-            if new_availability:
-                messages.success(request, 'Availability updated successfully.')
-            elif team_action == 'add':
-                messages.success(request, 'Added to team.')
-            elif team_action == 'remove':
-                messages.success(request, 'Removed from team.')
-
-        return redirect('bulk_availability', match_pk=match_pk)
+    # Count selectable (available but not in team)
+    selectable_count = len([p for p in available_players if not p.is_selected])
 
     return render(request, 'clubs/bulk_availability.html', {
         'match': match,
-        'selected_players': selected_players,
         'available_players': available_players,
         'maybe_players': maybe_players,
-        'unavailable_players': unavailable_players,
         'awaiting_players': awaiting_players,
+        'unavailable_players': unavailable_players,
+        'selected_count': selected_count,
+        'selectable_count': selectable_count,
+        'open_accordion': open_accordion,
     })
 
 
@@ -545,7 +597,7 @@ def match_list(request):
         match.selected_count = match.match_players.filter(selected=True).count()
         match.available_count = match.match_players.filter(availability='yes', selected=False).count()
         match.maybe_count = match.match_players.filter(availability='maybe', selected=False).count()
-    
+
     is_admin_or_captain = player.club.is_admin_or_captain(request.user)
     return render(request, 'clubs/match_list.html', {
         'matches': matches,
@@ -637,6 +689,130 @@ def my_availability(request):
         'is_admin_or_captain': is_admin_or_captain,
     })
 
+
+@login_required
+def bulk_availability(request, match_pk):
+    """View/manage availability for all players for a match"""
+    match = get_object_or_404(Match, pk=match_pk)
+
+    # Permission check - only admin/captain can manage availability
+    if not match.club.is_admin_or_captain(request.user):
+        raise PermissionDenied
+
+    # Get current user's player record
+    current_player = Player.objects.filter(user=request.user).first()
+
+    # Get all players and their availability for this match
+    players = Player.objects.filter(club=match.club, is_active=True)
+
+    # Split players into categories by availability only (not selection)
+    available_players = []
+    maybe_players = []
+    awaiting_players = []
+    unavailable_players = []
+    selected_count = 0
+
+    for player in players:
+        mp = match.match_players.filter(player=player).first()
+        player.is_selected = mp.selected if mp else False
+        player.availability = mp.availability if mp else None
+        player.is_current_user = (player == current_player)
+
+        if player.is_selected:
+            selected_count += 1
+
+        if player.availability == 'yes':
+            available_players.append(player)
+        elif player.availability == 'maybe':
+            maybe_players.append(player)
+        elif player.availability is None:
+            awaiting_players.append(player)
+        else:
+            unavailable_players.append(player)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        selected_ids = request.POST.getlist('selected')
+        current_accordion = request.POST.get('current_accordion', 'availablePlayers')
+
+        if action == 'set_available':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'yes'}
+                )
+                match_player.availability = 'yes'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Available.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'set_maybe':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'maybe'}
+                )
+                match_player.availability = 'maybe'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Maybe.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'set_unavailable':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': 'no'}
+                )
+                match_player.availability = 'no'
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) set to Unavailable.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'add_to_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
+                match_player.selected = True
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) added to team.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+        elif action == 'remove_from_team':
+            for player_id in selected_ids:
+                match_player, created = MatchPlayer.objects.get_or_create(
+                    match=match,
+                    player_id=player_id,
+                    defaults={'availability': None}
+                )
+                match_player.selected = False
+                match_player.save()
+            messages.success(request, f'{len(selected_ids)} player(s) removed from team.')
+            return redirect(f"{reverse('bulk_availability', args=[match_pk])}?open={current_accordion}")
+
+    # Get which accordion to open from URL param
+    open_accordion = request.GET.get('open', 'availablePlayers')
+
+    # Count how many available players are already in team
+    in_team_count = len([p for p in available_players if p.is_selected])
+    selectable_count = len(available_players) - in_team_count
+
+    return render(request, 'clubs/bulk_availability.html', {
+        'match': match,
+        'available_players': available_players,
+        'maybe_players': maybe_players,
+        'awaiting_players': awaiting_players,
+        'unavailable_players': unavailable_players,
+        'selected_count': selected_count,
+        'selectable_count': selectable_count,
+        'in_team_count': in_team_count,
+        'open_accordion': open_accordion,
+    })
 
 @login_required
 def player_availability(request, player_pk):

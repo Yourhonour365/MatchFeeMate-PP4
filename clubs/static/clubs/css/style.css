@@ -267,3 +267,19 @@ a:hover {
     font-size: 0.75rem;
     font-style: italic;
 }
+.player-name-link {
+    font-size: 0.9rem;
+    color: #00008b;
+}
+
+.available-calc {
+    font-size: .8rem;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.selected-calc {
+    font-size: 0.75rem;
+    font-style: italic;
+    font-weight: normal;
+}

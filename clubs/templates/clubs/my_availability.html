@@ -27,7 +27,7 @@
                 </div>
                 
                 <!-- Row 2: Availability, Selection · Team count -->
-                <div class="small mt-1 fw-bold" style="margin-left: 1.5rem;">
+                <div class="small mt-1" style="margin-left: 1.5rem;">
                     <span class="{% if match.my_availability == 'yes' %}text-success{% elif match.my_availability == 'maybe' %}text-warning{% elif match.my_availability == 'no' %}text-danger{% else %}text-muted{% endif %}">
                         {% if match.my_availability == 'yes' %}Available{% elif match.my_availability == 'maybe' %}Maybe{% elif match.my_availability == 'no' %}Unavailable{% else %}Not Set{% endif %}{% if match.is_selected %}, Selected{% endif %}
                     </span>
