@@ -34,10 +34,9 @@ Lighthouse audits were performed on key pages. All scores are 90+.
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |------|-------------|---------------|----------------|-----|
-| Home | | | | |
-| Match List | | | | |
-| Team Selection | | | | |
-| My Availability | | | | |
+| Home | 97 | 100 | 100 | 100 |
+| Match List | 95 | 95 | 100 | 100 |
+| My Availability | 98| 95 | 100 | 100 |
 
 ![Lighthouse Report](docs/testing/lighthouse-report.pdf)
 
